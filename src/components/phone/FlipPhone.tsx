@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import {
   backspace,
@@ -25,6 +26,63 @@ const initialState: MultiTapState = {
   pendingKey: null,
   pendingIndex: 0
 };
+
+const landingStickers = [
+  {
+    src: "/assets/landing/error-stack.png",
+    className: "landing-sticker landing-error-stack",
+    width: 1536,
+    height: 1024
+  },
+  {
+    src: "/assets/landing/calendar.png",
+    className: "landing-sticker landing-calendar",
+    width: 124,
+    height: 102
+  },
+  {
+    src: "/assets/landing/new-jess.png",
+    className: "landing-sticker landing-new-jess",
+    width: 1679,
+    height: 937
+  },
+  {
+    src: "/assets/landing/cursor.png",
+    className: "landing-sticker landing-cursor",
+    width: 185,
+    height: 109
+  },
+  {
+    src: "/assets/landing/loading-window.jpg",
+    className: "landing-sticker landing-loading",
+    width: 590,
+    height: 370
+  },
+  {
+    src: "/assets/landing/cd-case.png",
+    className: "landing-sticker landing-cd",
+    width: 1536,
+    height: 1024
+  },
+  {
+    src: "/assets/landing/music-file.png",
+    className: "landing-sticker landing-music",
+    width: 205,
+    height: 257
+  },
+  {
+    src: "/assets/landing/camera.png",
+    className: "landing-sticker landing-camera",
+    width: 1536,
+    height: 1024
+  },
+  {
+    src: "/assets/landing/folder.png",
+    className: "landing-sticker landing-folder",
+    width: 209,
+    height: 182
+  }
+];
 
 export function FlipPhone({ onConnected, onSkip }: FlipPhoneProps) {
   const [tapState, setTapState] = useState<MultiTapState>(initialState);
@@ -103,36 +161,53 @@ export function FlipPhone({ onConnected, onSkip }: FlipPhoneProps) {
   });
 
   return (
-    <section className="relative grid min-h-screen place-items-center overflow-hidden bg-white px-4 py-6 sm:px-8">
+    <section className="landing-collage-stage">
       <button
         type="button"
         onClick={onSkip}
-        className="focus-ring absolute right-5 top-5 z-20 font-mono text-xl text-cobalt underline decoration-dotted underline-offset-4 sm:right-8"
+        className="focus-ring landing-skip-link"
       >
         skip intro →
       </button>
       <motion.div
-        className="phone-device"
+        className="landing-collage-canvas"
         initial={reduceMotion ? false : { opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35 }}
       >
-        <div className="phone-top-shell">
-          <div className="phone-camera" aria-hidden="true" />
-          <PhoneScreen text={text} status={status} />
-        </div>
-        <div className="phone-hinge" aria-hidden="true">
-          <span />
-          <span />
-        </div>
-        <div className="phone-bottom-shell">
-          <PhoneKeypad
-            onDigit={handleDigit}
-            onBack={handleBack}
-            onOk={handleOk}
-            canConnect={canConnect}
-            disabled={status !== "typing"}
+        {landingStickers.map((sticker) => (
+          <Image
+            key={sticker.src}
+            src={sticker.src}
+            alt=""
+            aria-hidden="true"
+            width={sticker.width}
+            height={sticker.height}
+            className={sticker.className}
+            priority
+            draggable={false}
           />
+        ))}
+        <div className="phone-placement">
+          <div className="phone-device">
+            <div className="phone-top-shell">
+              <div className="phone-camera" aria-hidden="true" />
+              <PhoneScreen text={text} status={status} />
+            </div>
+            <div className="phone-hinge" aria-hidden="true">
+              <span />
+              <span />
+            </div>
+            <div className="phone-bottom-shell">
+              <PhoneKeypad
+                onDigit={handleDigit}
+                onBack={handleBack}
+                onOk={handleOk}
+                canConnect={canConnect}
+                disabled={status !== "typing"}
+              />
+            </div>
+          </div>
         </div>
       </motion.div>
     </section>
