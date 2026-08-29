@@ -1,0 +1,411 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: "Trebuchet MS", Arial, sans-serif;
+  --font-display: Georgia, "Times New Roman", serif;
+  --font-mono: "Courier New", monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background:
+    linear-gradient(rgba(21, 52, 163, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(21, 52, 163, 0.04) 1px, transparent 1px),
+    #fffdf7;
+  background-size: 28px 28px;
+  color: #151515;
+  font-family: var(--font-sans);
+}
+
+button,
+a {
+  color: inherit;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+::selection {
+  background: #1534a3;
+  color: #fffdf7;
+}
+
+.focus-ring {
+  outline: none;
+}
+
+.focus-ring:focus-visible {
+  outline: 3px solid #ff8da1;
+  outline-offset: 3px;
+}
+
+.rabbit-frame {
+  box-shadow: 4px 4px 0 #1534a3;
+}
+
+.notepad-scrap {
+  border: 2px solid #151515;
+  background: #fff;
+  box-shadow: 5px 5px 0 #151515;
+  color: #1534a3;
+  font-family: var(--font-mono);
+  font-size: 1.45rem;
+  line-height: 1;
+  padding: 0.8rem;
+  width: max-content;
+}
+
+.phone-device {
+  width: min(78vw, 330px);
+  transform-origin: center;
+  filter: drop-shadow(18px 26px 20px rgba(35, 40, 48, 0.2));
+}
+
+.phone-top-shell,
+.phone-bottom-shell {
+  position: relative;
+  margin-inline: auto;
+  border: 1px solid #67717f;
+  background:
+    radial-gradient(circle at 22% 11%, rgba(255, 255, 255, 0.94), transparent 20%),
+    radial-gradient(circle at 86% 38%, rgba(255, 255, 255, 0.35), transparent 18%),
+    linear-gradient(135deg, #edf0f4 0%, #b9c0ca 42%, #858f9c 67%, #d9dee5 100%);
+  box-shadow:
+    inset 9px 10px 15px rgba(255, 255, 255, 0.66),
+    inset -8px -12px 18px rgba(47, 55, 67, 0.2),
+    0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.phone-top-shell {
+  width: 74%;
+  min-height: 292px;
+  border-radius: 50% 50% 16px 16px / 17% 17% 14px 14px;
+  padding: 34px 31px 28px;
+}
+
+.phone-top-shell::before,
+.phone-top-shell::after {
+  content: "";
+  position: absolute;
+  top: 70px;
+  width: 24px;
+  height: 18px;
+  border-top: 2px solid rgba(87, 96, 109, 0.45);
+}
+
+.phone-top-shell::before {
+  left: 14px;
+  border-left: 2px solid rgba(87, 96, 109, 0.32);
+  border-radius: 12px 0 0 0;
+}
+
+.phone-top-shell::after {
+  right: 14px;
+  border-right: 2px solid rgba(87, 96, 109, 0.32);
+  border-radius: 0 12px 0 0;
+}
+
+.phone-camera {
+  width: 37px;
+  height: 37px;
+  margin: -12px auto 20px;
+  border: 2px solid #7c8794;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle, #ecf1f8 0 22%, #636e7d 24% 38%, #b7bec8 40% 60%, #eef1f5 62%);
+  box-shadow: inset 2px 2px 3px rgba(255, 255, 255, 0.75);
+}
+
+.phone-screen {
+  position: relative;
+  overflow: hidden;
+  min-height: 145px;
+  border: 8px solid #25303c;
+  border-radius: 4px;
+  background:
+    repeating-linear-gradient(0deg, rgba(21, 52, 163, 0.08) 0 1px, transparent 1px 5px),
+    linear-gradient(#dbe7ff, #adc7fb);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.8),
+    inset 0 0 20px rgba(21, 52, 163, 0.12);
+}
+
+.phone-screen-status {
+  display: flex;
+  justify-content: space-between;
+  background: #1534a3;
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  line-height: 1;
+  padding: 0.18rem 0.32rem;
+}
+
+.phone-screen-content {
+  display: grid;
+  min-height: 115px;
+  place-items: center;
+  padding: 0.45rem;
+  text-align: center;
+}
+
+.phone-screen-rabbit {
+  width: 58px !important;
+  height: 58px !important;
+  border-width: 1px;
+  box-shadow: 2px 2px 0 #1534a3;
+}
+
+.phone-screen-prompt,
+.phone-screen-message {
+  color: #1534a3;
+  font-family: var(--font-mono);
+  font-size: clamp(1rem, 3vw, 1.45rem);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.phone-screen-loader {
+  display: block;
+  width: 78%;
+  height: 8px;
+  border: 1px solid #1534a3;
+  padding: 1px;
+}
+
+.phone-screen-loader::before {
+  content: "";
+  display: block;
+  width: 58%;
+  height: 100%;
+  background: #1534a3;
+}
+
+.phone-screen-loader.is-complete::before {
+  width: 100%;
+}
+
+.phone-hinge {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  width: 67%;
+  height: 37px;
+  align-items: center;
+  justify-content: space-between;
+  margin: -4px auto;
+  padding-inline: 18px;
+  border: 1px solid #5f6976;
+  border-radius: 17px;
+  background: linear-gradient(90deg, #6b7480 0%, #eef1f5 18%, #8e98a4 50%, #eef1f5 82%, #6b7480 100%);
+  box-shadow:
+    inset 0 8px 8px rgba(255, 255, 255, 0.45),
+    0 5px 8px rgba(28, 35, 45, 0.12);
+}
+
+.phone-hinge span {
+  width: 34px;
+  height: 31px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #dce1e8, #7f8996);
+  box-shadow: inset 3px 0 4px rgba(255, 255, 255, 0.65);
+}
+
+.phone-bottom-shell {
+  width: 78%;
+  min-height: 326px;
+  border-radius: 18px 18px 48% 48% / 16px 16px 13% 13%;
+  padding: 28px 25px 30px;
+}
+
+.phone-controls {
+  color: #1534a3;
+  font-family: var(--font-mono);
+}
+
+.phone-nav-pad {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 62px 1fr;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 14px;
+}
+
+.phone-ok {
+  display: grid;
+  width: 62px;
+  height: 62px;
+  place-items: center;
+  border: 2px solid #66717f;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle, #87919f 0 27%, #cbd1da 30% 47%, #808b99 50% 62%, #dce1e8 66%);
+  color: #1534a3;
+  font-size: 1rem;
+  font-weight: 700;
+  box-shadow: inset 3px 4px 5px rgba(255, 255, 255, 0.65);
+}
+
+.phone-soft,
+.phone-key {
+  border: 1px solid #717b88;
+  background: linear-gradient(#eef2f7, #b9c1cc 58%, #9aa4b1);
+  box-shadow:
+    inset 2px 2px 2px rgba(255, 255, 255, 0.8),
+    inset -2px -2px 3px rgba(62, 70, 82, 0.22);
+}
+
+.phone-soft {
+  min-height: 32px;
+  border-radius: 13px 8px;
+  font-size: 0.7rem;
+  line-height: 1;
+}
+
+.phone-number-pad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 7px 8px;
+}
+
+.phone-key {
+  display: grid;
+  min-height: 36px;
+  place-items: center;
+  border-radius: 9px 6px;
+  line-height: 0.9;
+  padding: 0.16rem 0.1rem;
+}
+
+.phone-key span {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.phone-key small {
+  font-size: 0.54rem;
+  letter-spacing: 0;
+}
+
+.world-canvas {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 18% 8%, rgba(159, 227, 193, 0.24), transparent 22%),
+    radial-gradient(circle at 82% 35%, rgba(255, 141, 161, 0.18), transparent 18%),
+    #fffdf7;
+}
+
+.world-canvas::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.18;
+  background-image: repeating-linear-gradient(0deg, transparent 0 4px, rgba(21, 52, 163, 0.2) 5px);
+  mix-blend-mode: multiply;
+}
+
+.scroll-zone {
+  scroll-margin-top: 2rem;
+}
+
+.zone-label {
+  position: absolute;
+  left: 1.25rem;
+  top: 2rem;
+  border: 1px solid #1534a3;
+  background: #fff;
+  padding: 0.15rem 0.4rem;
+}
+
+.collage-object {
+  max-width: 100%;
+}
+
+.retro-panel {
+  border: 2px solid #151515;
+}
+
+.cd-disc {
+  display: grid;
+  height: 180px;
+  width: 180px;
+  place-items: center;
+  border: 2px solid rgba(21, 21, 21, 0.35);
+  border-radius: 999px;
+  background:
+    radial-gradient(circle, #fff 0 14%, #1534a3 15% 18%, transparent 19%),
+    conic-gradient(from 45deg, #fff, #dfe8ff, #9fe3c1, #fff, #ff8da1, #fff);
+  color: #1534a3;
+  font-family: var(--font-mono);
+  font-size: 1.8rem;
+  box-shadow: 8px 8px 0 rgba(21, 21, 21, 0.15);
+}
+
+.notepad-scrap {
+  min-height: 160px;
+  width: 240px;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 27px, rgba(21, 52, 163, 0.24) 28px),
+    #fff;
+}
+
+.screen-flicker {
+  animation: screen-flicker 0.9s steps(2) infinite;
+}
+
+@keyframes screen-flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.78;
+  }
+}
+
+@media (max-width: 767px) {
+  .phone-device {
+    width: min(94vw, 318px);
+  }
+
+  .scroll-zone {
+    min-height: auto;
+    padding-bottom: 5rem;
+    padding-top: 6rem;
+  }
+
+  .scroll-zone .retro-panel {
+    position: relative;
+    left: auto;
+    right: auto;
+    top: auto;
+    width: 100%;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
