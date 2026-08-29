@@ -69,6 +69,7 @@ button:disabled {
 
 .phone-device {
   width: min(78vw, 330px);
+  scale: 1.12;
   transform-origin: center;
   filter:
     drop-shadow(3px 8px 6px rgba(255, 255, 255, 0.65))
@@ -134,8 +135,8 @@ button:disabled {
 .phone-camera {
   position: relative;
   z-index: 1;
-  width: 37px;
-  height: 37px;
+  width: 27px;
+  height: 27px;
   margin: -12px auto 20px;
   border: 2px solid #6e7886;
   border-radius: 999px;
@@ -207,6 +208,10 @@ button:disabled {
   font-size: clamp(1rem, 3vw, 1.45rem);
   font-weight: 700;
   line-height: 1;
+}
+
+.phone-cursor {
+  animation: phone-cursor-blink 820ms steps(1, end) infinite;
 }
 
 .phone-screen-loader {
@@ -463,9 +468,21 @@ button:disabled {
   }
 }
 
+@keyframes phone-cursor-blink {
+  0%,
+  54% {
+    opacity: 1;
+  }
+  55%,
+  100% {
+    opacity: 0;
+  }
+}
+
 @media (max-width: 767px) {
   .phone-device {
     width: min(94vw, 318px);
+    scale: 1;
   }
 
   .scroll-zone {
@@ -492,5 +509,9 @@ button:disabled {
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .phone-cursor {
+    animation: none;
   }
 }

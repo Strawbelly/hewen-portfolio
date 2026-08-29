@@ -16,7 +16,12 @@ export function PhoneScreen({ text, status }: PhoneScreenProps) {
         {status === "typing" ? (
           <>
             <RabbitAvatar size="sm" priority className="phone-screen-rabbit" />
-            <span className="phone-screen-prompt">{text || "ENTER NAME_"}</span>
+            <span className="phone-screen-prompt">
+              {text || "ENTER NAME"}
+              <span className="phone-cursor" aria-hidden="true">
+                _
+              </span>
+            </span>
           </>
         ) : (
           <>
