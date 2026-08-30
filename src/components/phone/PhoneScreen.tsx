@@ -9,10 +9,13 @@ export function PhoneScreen({ text, status }: PhoneScreenProps) {
   return (
     <div className="phone-screen">
       <div className="phone-screen-status">
-        <span>HSHN</span>
+        <span>HS&apos;sWORLD</span>
         <span>{status === "typing" ? "abc" : "net"}</span>
       </div>
-      <div className="phone-screen-content" aria-live={status === "typing" ? "polite" : "assertive"}>
+      <div
+        className="phone-screen-content"
+        aria-live={status === "typing" ? "polite" : "assertive"}
+      >
         {status === "typing" ? (
           <>
             <RabbitAvatar size="sm" priority className="phone-screen-rabbit" />
@@ -28,7 +31,9 @@ export function PhoneScreen({ text, status }: PhoneScreenProps) {
             <span className="phone-screen-message screen-flicker">
               {status === "connecting" ? "CONNECTING..." : "CONNECTED"}
             </span>
-            <span className={`phone-screen-loader ${status === "connected" ? "is-complete" : ""}`} />
+            <span
+              className={`phone-screen-loader ${status === "connected" ? "is-complete" : ""}`}
+            />
           </>
         )}
       </div>
