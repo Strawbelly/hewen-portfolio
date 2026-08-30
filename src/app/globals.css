@@ -173,23 +173,7 @@ button:disabled {
   width: 74%;
   min-height: 292px;
   border-radius: 50% 50% 16px 16px / 17% 17% 14px 14px;
-  padding: 34px 31px 28px;
-}
-
-.phone-top-shell::after {
-  content: "";
-  position: absolute;
-  top: 70px;
-  width: 24px;
-  height: 18px;
-  border-top: 2px solid rgba(87, 96, 109, 0.45);
-}
-
-.phone-top-shell::after {
-  right: 14px;
-  border-right: 2px solid rgba(87, 96, 109, 0.32);
-  border-radius: 0 12px 0 0;
-  box-shadow: -174px 0 0 rgba(0, 0, 0, 0), -174px 0 0 -1px rgba(87, 96, 109, 0.32);
+  padding: 34px 31px 34px;
 }
 
 .phone-camera {
@@ -198,17 +182,42 @@ button:disabled {
   width: 27px;
   height: 27px;
   margin: -12px auto 20px;
-  border: 2px solid #657386;
+  border: 1px solid #5f6d80;
   border-radius: 999px;
   background:
-    radial-gradient(circle at 34% 25%, #f7fbff 0 6%, rgba(168, 208, 255, 0.82) 7% 10%, transparent 11%),
-    radial-gradient(circle at 58% 60%, #02040a 0 24%, #071022 25% 44%, #1b376f 45% 58%, #050913 59% 72%, #010205 73%),
-    linear-gradient(145deg, #dce4ee 0%, #8290a3 31%, #1b2029 32%, #06080d 100%);
+    radial-gradient(circle at 34% 25%, rgba(255, 255, 255, 0.92) 0 10%, rgba(255, 255, 255, 0) 11%),
+    radial-gradient(circle at 50% 54%, #2d3440 0 40%, #6a7788 41% 48%, #dce4ef 49% 65%, #8d9bad 66% 82%, #eef3f8 83% 100%);
   box-shadow:
-    inset 2px 2px 3px rgba(255, 255, 255, 0.5),
-    inset -3px -4px 5px rgba(0, 0, 0, 0.66),
-    0 0 0 2px rgba(31, 38, 50, 0.46),
-    0 1px 2px rgba(12, 16, 24, 0.42);
+    inset 2px 2px 3px rgba(255, 255, 255, 0.64),
+    inset -2px -3px 4px rgba(19, 26, 38, 0.5),
+    0 1px 2px rgba(12, 16, 24, 0.4);
+}
+
+.phone-camera::before {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border: 2px solid #1b222d;
+  border-radius: inherit;
+  background:
+    radial-gradient(circle at 34% 28%, rgba(160, 195, 255, 0.78) 0 9%, rgba(160, 195, 255, 0) 10%),
+    radial-gradient(circle at 48% 52%, #040715 0 21%, #09122c 22% 36%, #203b8a 37% 52%, #4b3a94 53% 66%, #10172b 67% 100%);
+  box-shadow:
+    inset 1px 1px 2px rgba(122, 155, 224, 0.38),
+    inset -2px -2px 3px rgba(0, 0, 0, 0.82),
+    0 0 0 1px rgba(225, 232, 242, 0.35);
+}
+
+.phone-camera::after {
+  content: "";
+  position: absolute;
+  left: 7px;
+  top: 5px;
+  width: 4px;
+  height: 4px;
+  border-radius: inherit;
+  background: #ffffff;
+  box-shadow: 0 0 2px rgba(190, 225, 255, 0.95);
 }
 
 .phone-screen {
@@ -216,8 +225,8 @@ button:disabled {
   z-index: 1;
   overflow: hidden;
   min-height: 145px;
-  border: 10px solid #16202b;
-  border-radius: 6px;
+  border: 9px solid #16202b;
+  border-radius: 8px;
   background:
     repeating-linear-gradient(0deg, rgba(21, 52, 163, 0.08) 0 1px, transparent 1px 5px),
     linear-gradient(145deg, #e5eeff 0%, #b8cffd 58%, #9fbaf0 100%);

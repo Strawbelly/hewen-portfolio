@@ -9,7 +9,7 @@ export function PhoneScreen({ text, status }: PhoneScreenProps) {
   return (
     <div className="phone-screen">
       <div className="phone-screen-status">
-        <span>HS&apos;sWORLD</span>
+        <span>HSworld</span>
         <span>{status === "typing" ? "abc" : "net"}</span>
       </div>
       <div

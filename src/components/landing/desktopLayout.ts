@@ -42,9 +42,9 @@ export const desktopLayout = {
     zIndex: 1
   },
   loading: {
-    x: 220,
-    y: 595,
-    width: 480,
+    x: 225,
+    y: 625,
+    width: 440,
     rotation: 0,
     zIndex: 2
   },
