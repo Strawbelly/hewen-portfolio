@@ -65,6 +65,13 @@ export const desktopLayout = {
     scale: 1.125,
     transformOrigin: "center 46%"
   },
+  helloWorld: {
+    x: 1040,
+    y: 150,
+    width: 210,
+    rotation: 0,
+    zIndex: 16
+  },
   music: {
     x: 940,
     y: 425,

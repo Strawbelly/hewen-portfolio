@@ -7,8 +7,17 @@ import type { CollageLayoutItem, CollageMotion } from "@/components/landing/desk
 type CollageItemProps = {
   item: CollageLayoutItem;
   motionConfig?: CollageMotion;
+  hoverConfig?: CollageHover;
   className?: string;
   children: ReactNode;
+};
+
+export type CollageHover = {
+  scale?: number;
+  x?: number;
+  y?: number;
+  rotate?: number;
+  duration?: number;
 };
 
 type CollageItemStyle = CSSProperties & {
@@ -21,7 +30,13 @@ type CollageItemStyle = CSSProperties & {
   "--collage-transform-origin": string;
 };
 
-export function CollageItem({ item, motionConfig, className, children }: CollageItemProps) {
+export function CollageItem({
+  item,
+  motionConfig,
+  hoverConfig,
+  className,
+  children
+}: CollageItemProps) {
   const style: CollageItemStyle = {
     "--collage-x": item.x,
     "--collage-y": item.y,
@@ -35,6 +50,27 @@ export function CollageItem({ item, motionConfig, className, children }: Collage
   if (item.height !== undefined) {
     style.height = item.height;
   }
+
+  const content = hoverConfig ? (
+    <motion.div
+      className="landing-collage-hover"
+      whileHover={{
+        scale: hoverConfig.scale ?? 1,
+        x: hoverConfig.x ?? 0,
+        y: hoverConfig.y ?? 0,
+        rotate: hoverConfig.rotate ?? 0
+      }}
+      transition={{
+        type: "tween",
+        duration: hoverConfig.duration ?? 0.25,
+        ease: "easeInOut"
+      }}
+    >
+      {children}
+    </motion.div>
+  ) : (
+    children
+  );
 
   return (
     <div className={["landing-collage-item", className].filter(Boolean).join(" ")} style={style}>
@@ -54,10 +90,10 @@ export function CollageItem({ item, motionConfig, className, children }: Collage
             repeatType: "mirror"
           }}
         >
-          {children}
+          {content}
         </motion.div>
       ) : (
-        <div className="landing-collage-motion">{children}</div>
+        <div className="landing-collage-motion">{content}</div>
       )}
     </div>
   );

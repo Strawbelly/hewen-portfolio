@@ -3,7 +3,8 @@
 import { motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { CollageItem } from "@/components/landing/CollageItem";
+import { CollageItem, type CollageHover } from "@/components/landing/CollageItem";
+import { HelloWorldReveal } from "@/components/landing/HelloWorldReveal";
 import {
   DESIGN_HEIGHT,
   DESIGN_WIDTH,
@@ -38,12 +39,13 @@ const DESKTOP_BREAKPOINT = 768;
 
 const getViewportLayout = () => {
   if (typeof window === "undefined") {
-    return { isDesktop: true, scale: 1 };
+    return { isDesktop: true, supportsHover: false, scale: 1 };
   }
 
   const isDesktop = window.innerWidth >= DESKTOP_BREAKPOINT;
   return {
     isDesktop,
+    supportsHover: window.matchMedia("(hover: hover) and (pointer: fine)").matches,
     scale: Math.min(window.innerWidth / DESIGN_WIDTH, window.innerHeight / DESIGN_HEIGHT)
   };
 };
@@ -61,14 +63,16 @@ const landingStickers = [
     src: "/assets/landing/calendar.png",
     className: "landing-calendar",
     width: 124,
-    height: 102
+    height: 102,
+    hover: { scale: 1.06, y: -5, rotate: 3, duration: 0.25 }
   },
   {
     layoutKey: "newJess",
     src: "/assets/landing/new-jess.png",
     className: "landing-new-jess",
     width: 1679,
-    height: 937
+    height: 937,
+    hover: { scale: 1.03, y: -3, rotate: 0.75, duration: 0.3 }
   },
   {
     layoutKey: "cursor",
@@ -85,32 +89,43 @@ const landingStickers = [
     height: 370
   },
   {
+    layoutKey: "helloWorld",
+    src: "/assets/landing/hello-world.png",
+    className: "landing-hello-world",
+    width: 1214,
+    height: 1295
+  },
+  {
     layoutKey: "cd",
     src: "/assets/landing/cd-case.png",
     className: "landing-cd",
     width: 1536,
-    height: 1024
+    height: 1024,
+    hover: { scale: 1.025, rotate: 4, duration: 0.35 }
   },
   {
     layoutKey: "music",
     src: "/assets/landing/music-file.png",
     className: "landing-music",
     width: 205,
-    height: 257
+    height: 257,
+    hover: { scale: 1.08, y: -4, rotate: -3, duration: 0.22 }
   },
   {
     layoutKey: "camera",
     src: "/assets/landing/camera.png",
     className: "landing-camera",
     width: 1536,
-    height: 1024
+    height: 1024,
+    hover: { scale: 1.025, y: -4, rotate: 1, duration: 0.3 }
   },
   {
     layoutKey: "folder",
     src: "/assets/landing/folder.png",
     className: "landing-folder",
     width: 209,
-    height: 182
+    height: 182,
+    hover: { scale: 1.06, y: -8, rotate: 2, duration: 0.25 }
   }
 ] as const;
 
@@ -217,6 +232,9 @@ export function FlipPhone({ onConnected, onSkip }: FlipPhoneProps) {
   const getAmbientMotion = (layoutKey: keyof typeof desktopLayout) =>
     viewportLayout.isDesktop && !reduceMotion ? desktopMotion[layoutKey] : undefined;
 
+  const getHoverMotion = (hover?: CollageHover) =>
+    viewportLayout.isDesktop && viewportLayout.supportsHover && !reduceMotion ? hover : undefined;
+
   return (
     <section className="landing-collage-stage">
       <button
@@ -224,7 +242,10 @@ export function FlipPhone({ onConnected, onSkip }: FlipPhoneProps) {
         onClick={onSkip}
         className="focus-ring landing-skip-link"
       >
-        skip intro →
+        <span>skip intro</span>
+        <span className="landing-skip-arrow" aria-hidden="true">
+          →
+        </span>
       </button>
       <motion.div
         className="landing-collage-frame"
@@ -239,18 +260,27 @@ export function FlipPhone({ onConnected, onSkip }: FlipPhoneProps) {
               key={sticker.src}
               item={desktopLayout[sticker.layoutKey]}
               motionConfig={getAmbientMotion(sticker.layoutKey)}
+              hoverConfig={getHoverMotion("hover" in sticker ? sticker.hover : undefined)}
               className={sticker.className}
             >
-              <Image
-                src={sticker.src}
-                alt=""
-                aria-hidden="true"
-                width={sticker.width}
-                height={sticker.height}
-                className="landing-sticker"
-                priority
-                draggable={false}
-              />
+              {sticker.layoutKey === "helloWorld" ? (
+                <HelloWorldReveal
+                  src={sticker.src}
+                  width={sticker.width}
+                  height={sticker.height}
+                />
+              ) : (
+                <Image
+                  src={sticker.src}
+                  alt=""
+                  aria-hidden="true"
+                  width={sticker.width}
+                  height={sticker.height}
+                  className="landing-sticker"
+                  priority
+                  draggable={false}
+                />
+              )}
             </CollageItem>
           ))}
           <CollageItem
