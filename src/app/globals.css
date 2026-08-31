@@ -100,6 +100,10 @@ button:disabled {
   transform-origin: var(--collage-transform-origin);
 }
 
+.landing-collage-motion {
+  width: 100%;
+}
+
 .landing-sticker {
   display: block;
   width: 100%;

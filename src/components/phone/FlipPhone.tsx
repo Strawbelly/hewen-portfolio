@@ -4,7 +4,12 @@ import { motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { CollageItem } from "@/components/landing/CollageItem";
-import { DESIGN_HEIGHT, DESIGN_WIDTH, desktopLayout } from "@/components/landing/desktopLayout";
+import {
+  DESIGN_HEIGHT,
+  DESIGN_WIDTH,
+  desktopLayout,
+  desktopMotion
+} from "@/components/landing/desktopLayout";
 import {
   backspace,
   commitPending,
@@ -209,6 +214,9 @@ export function FlipPhone({ onConnected, onSkip }: FlipPhoneProps) {
       }
     : undefined;
 
+  const getAmbientMotion = (layoutKey: keyof typeof desktopLayout) =>
+    viewportLayout.isDesktop && !reduceMotion ? desktopMotion[layoutKey] : undefined;
+
   return (
     <section className="landing-collage-stage">
       <button
@@ -230,6 +238,7 @@ export function FlipPhone({ onConnected, onSkip }: FlipPhoneProps) {
             <CollageItem
               key={sticker.src}
               item={desktopLayout[sticker.layoutKey]}
+              motionConfig={getAmbientMotion(sticker.layoutKey)}
               className={sticker.className}
             >
               <Image
@@ -244,7 +253,11 @@ export function FlipPhone({ onConnected, onSkip }: FlipPhoneProps) {
               />
             </CollageItem>
           ))}
-          <CollageItem item={desktopLayout.phone} className="phone-placement">
+          <CollageItem
+            item={desktopLayout.phone}
+            motionConfig={getAmbientMotion("phone")}
+            className="phone-placement"
+          >
             <div className="phone-device">
               <div className="phone-top-shell">
                 <div className="phone-camera" aria-hidden="true" />

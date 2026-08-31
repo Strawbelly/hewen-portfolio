@@ -1,8 +1,12 @@
+"use client";
+
+import { motion } from "framer-motion";
 import type { CSSProperties, ReactNode } from "react";
-import type { CollageLayoutItem } from "@/components/landing/desktopLayout";
+import type { CollageLayoutItem, CollageMotion } from "@/components/landing/desktopLayout";
 
 type CollageItemProps = {
   item: CollageLayoutItem;
+  motionConfig?: CollageMotion;
   className?: string;
   children: ReactNode;
 };
@@ -17,7 +21,7 @@ type CollageItemStyle = CSSProperties & {
   "--collage-transform-origin": string;
 };
 
-export function CollageItem({ item, className, children }: CollageItemProps) {
+export function CollageItem({ item, motionConfig, className, children }: CollageItemProps) {
   const style: CollageItemStyle = {
     "--collage-x": item.x,
     "--collage-y": item.y,
@@ -34,7 +38,27 @@ export function CollageItem({ item, className, children }: CollageItemProps) {
 
   return (
     <div className={["landing-collage-item", className].filter(Boolean).join(" ")} style={style}>
-      {children}
+      {motionConfig ? (
+        <motion.div
+          className="landing-collage-motion"
+          animate={{
+            x: motionConfig.x ?? 0,
+            y: motionConfig.y ?? 0,
+            rotate: motionConfig.rotate ?? 0
+          }}
+          transition={{
+            duration: motionConfig.duration,
+            delay: motionConfig.delay,
+            ease: "easeInOut",
+            repeat: Infinity,
+            repeatType: "mirror"
+          }}
+        >
+          {children}
+        </motion.div>
+      ) : (
+        <div className="landing-collage-motion">{children}</div>
+      )}
     </div>
   );
 }
