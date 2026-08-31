@@ -1,18 +1,18 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { mainWorldLayout, type MainWorldWindowLayout } from "@/components/collage/mainWorldLayout";
 import { AboutNotepad } from "@/components/collage/windows/AboutNotepad";
 import { BeforeCodeImageViewer } from "@/components/collage/windows/BeforeCodeImageViewer";
 import { ContactSystemDialog } from "@/components/collage/windows/ContactSystemDialog";
-import { ContextMenuFragment } from "@/components/collage/windows/ContextMenuFragment";
 import { ExperienceEditor } from "@/components/collage/windows/ExperienceEditor";
 import { JourneyLogWindow } from "@/components/collage/windows/JourneyLogWindow";
 import { ProjectPreviewWindow } from "@/components/collage/windows/ProjectPreviewWindow";
 import { ProjectsOpenDialog } from "@/components/collage/windows/ProjectsOpenDialog";
 import { projectOptions, type ProjectOption } from "@/components/collage/windows/projectOptions";
 import { Taskbar } from "@/components/retro/Taskbar";
+import type { TaskbarWindowId } from "@/components/retro/taskbarItems";
 
 type WindowStyle = CSSProperties & {
   "--world-x": number;
@@ -30,46 +30,116 @@ const windowStyle = (layout: MainWorldWindowLayout): WindowStyle => ({
   "--world-rotation": `${layout.rotation}deg`
 });
 
-const placement = (layout: MainWorldWindowLayout) => ({
+const initialWindowZ = Object.fromEntries(
+  Object.entries(mainWorldLayout).map(([id, layout]) => [id, layout.zIndex])
+) as Record<string, number>;
+
+const highestInitialZ = Math.max(...Object.values(initialWindowZ));
+const desktopWindowIds: TaskbarWindowId[] = [
+  "projects",
+  "experience",
+  "journey",
+  "about",
+  "beforeCode",
+  "contact",
+];
+const initialActiveWindowId = desktopWindowIds.reduce((front, id) =>
+  initialWindowZ[id] > initialWindowZ[front] ? id : front
+);
+
+const placement = (
+  id: TaskbarWindowId,
+  layout: MainWorldWindowLayout,
+  zIndexes: Record<string, number>,
+  bringToFront: (id: TaskbarWindowId) => void
+) => ({
   style: windowStyle(layout),
-  zIndex: layout.zIndex
+  zIndex: zIndexes[id] ?? layout.zIndex,
+  interaction: {
+    onActivate: () => bringToFront(id),
+  },
 });
 
 export function CollageCanvas() {
+  const highestZ = useRef(highestInitialZ);
+  const activeWindowRef = useRef<TaskbarWindowId>(initialActiveWindowId);
+  const [zIndexes, setZIndexes] = useState(initialWindowZ);
+  const [activeWindowId, setActiveWindowId] = useState<TaskbarWindowId>(initialActiveWindowId);
   const [selectedProjectId, setSelectedProjectId] = useState(projectOptions[0].id);
   const [openedProject, setOpenedProject] = useState<ProjectOption | null>(null);
   const selectedProject =
     projectOptions.find((project) => project.id === selectedProjectId) ?? projectOptions[0];
 
+  const bringToFront = useCallback((id: TaskbarWindowId) => {
+    if (activeWindowRef.current === id) return;
+    highestZ.current += 1;
+    const nextZ = highestZ.current;
+    activeWindowRef.current = id;
+    setActiveWindowId(id);
+    setZIndexes((current) => ({ ...current, [id]: nextZ }));
+  }, []);
+
+  const openProject = () => {
+    bringToFront("projectPreview");
+    setOpenedProject(selectedProject);
+  };
+
+  const closeProject = () => {
+    setOpenedProject(null);
+    const nextActiveWindow = desktopWindowIds.reduce((front, id) =>
+      (zIndexes[id] ?? 0) > (zIndexes[front] ?? 0) ? id : front
+    );
+    activeWindowRef.current = nextActiveWindow;
+    setActiveWindowId(nextActiveWindow);
+  };
+
   return (
     <div id="top" className="world-canvas main-world-desktop">
       <main className="main-world-pile" aria-label="Hewen's editorial desktop collage">
-        <BeforeCodeImageViewer id="before-code" {...placement(mainWorldLayout.beforeCode)} />
-        <JourneyLogWindow id="journey" {...placement(mainWorldLayout.journey)} />
-        <ExperienceEditor id="experience" {...placement(mainWorldLayout.experience)} />
+        <BeforeCodeImageViewer
+          id="before-code"
+          {...placement("beforeCode", mainWorldLayout.beforeCode, zIndexes, bringToFront)}
+        />
+        <JourneyLogWindow
+          id="journey"
+          {...placement("journey", mainWorldLayout.journey, zIndexes, bringToFront)}
+        />
+        <ExperienceEditor
+          id="experience"
+          {...placement("experience", mainWorldLayout.experience, zIndexes, bringToFront)}
+        />
         <ProjectsOpenDialog
           id="projects"
-          {...placement(mainWorldLayout.projects)}
+          {...placement("projects", mainWorldLayout.projects, zIndexes, bringToFront)}
           projects={projectOptions}
           selectedProject={selectedProject}
           onSelect={setSelectedProjectId}
-          onOpen={() => setOpenedProject(selectedProject)}
+          onOpen={openProject}
           onCancel={() => setOpenedProject(null)}
         />
-        <ContextMenuFragment {...placement(mainWorldLayout.contextMenu)} />
-        <AboutNotepad id="about" {...placement(mainWorldLayout.about)} />
-        <ContactSystemDialog id="contact" {...placement(mainWorldLayout.contact)} />
+        <AboutNotepad
+          id="about"
+          {...placement("about", mainWorldLayout.about, zIndexes, bringToFront)}
+        />
+        <ContactSystemDialog
+          id="contact"
+          {...placement("contact", mainWorldLayout.contact, zIndexes, bringToFront)}
+        />
 
         {openedProject ? (
           <ProjectPreviewWindow
             id="project-preview"
-            {...placement(mainWorldLayout.projectPreview)}
+            {...placement("projectPreview", mainWorldLayout.projectPreview, zIndexes, bringToFront)}
             project={openedProject}
-            onClose={() => setOpenedProject(null)}
+            onClose={closeProject}
           />
         ) : null}
       </main>
-      <Taskbar />
+      <Taskbar
+        activeWindowId={activeWindowId}
+        onWindowActivate={bringToFront}
+        projectPreviewLabel={openedProject?.title}
+      />
     </div>
   );
 }

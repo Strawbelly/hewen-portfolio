@@ -576,11 +576,7 @@ button:disabled {
 .world-canvas {
   position: relative;
   overflow: hidden;
-  background:
-    linear-gradient(rgba(21, 52, 163, 0.028) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(21, 52, 163, 0.028) 1px, transparent 1px),
-    #f7f6f0;
-  background-size: 24px 24px;
+  background: url("/assets/main-world/main-page-bg.jpg") center / cover no-repeat;
 }
 
 .world-canvas::before {
@@ -594,7 +590,7 @@ button:disabled {
 }
 
 .main-world-desktop {
-  --main-world-taskbar-height: 50px;
+  --main-world-taskbar-height: 38px;
   --retro-title-height: 22px;
   --retro-title-size: 14px;
   --retro-menu-size: 12px;
@@ -610,11 +606,139 @@ button:disabled {
 
 .main-world-pile {
   position: relative;
+  z-index: 0;
   width: 100vw;
   max-width: none;
   height: calc(100vh - var(--main-world-taskbar-height));
   margin: 0;
   overflow: visible;
+}
+
+.desktop-taskbar {
+  position: fixed;
+  z-index: 1000;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  height: var(--main-world-taskbar-height);
+  align-items: center;
+  gap: 4px;
+  border-top: 2px solid #6ea0ff;
+  background: #245edb;
+  padding: 2px 4px;
+  color: #fff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  box-shadow: 0 -1px 0 #0b3aa4;
+}
+
+.desktop-start-button,
+.desktop-task-button,
+.desktop-resume-action {
+  display: inline-flex;
+  height: 30px;
+  align-items: center;
+  gap: 5px;
+  overflow: hidden;
+  border: 1px solid #173c8d;
+  border-radius: 2px;
+  padding: 0 10px;
+  color: #fff;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.desktop-start-button {
+  align-self: stretch;
+  flex: 0 0 auto;
+  height: auto;
+  margin: -2px 0 -2px -4px;
+  min-width: 98px;
+  justify-content: center;
+  border-color: #246523;
+  background: #3b9738;
+  box-shadow: 1px 1px 0 #83d477 inset, -1px -1px 0 #1f6221 inset;
+  font-size: 16px;
+  font-style: italic;
+}
+
+.desktop-task-buttons {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  gap: 3px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.desktop-task-buttons::-webkit-scrollbar {
+  display: none;
+}
+
+.desktop-task-button {
+  min-width: 102px;
+  max-width: 170px;
+  flex: 1 1 130px;
+  justify-content: flex-start;
+  background: #3980e5;
+  box-shadow: 1px 1px 0 #78a9ef inset, -1px -1px 0 #164aa9 inset;
+  font-weight: 400;
+}
+
+.desktop-task-button span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.desktop-taskbar-icon {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+  object-fit: contain;
+}
+
+.desktop-taskbar-icon.is-pixel-art {
+  image-rendering: pixelated;
+}
+
+.desktop-taskbar-fallback-icon {
+  display: inline-grid;
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+  place-items: center;
+}
+
+.desktop-task-button:hover {
+  background: #4a8dea;
+}
+
+.desktop-task-button.is-active {
+  background: #164aa9;
+  box-shadow: 1px 1px 0 #0e347c inset, -1px -1px 0 #4f8be6 inset;
+}
+
+.desktop-resume-action {
+  flex: 0 0 auto;
+  background: #3475d5;
+  box-shadow: 1px 1px 0 #78a9ef inset, -1px -1px 0 #164aa9 inset;
+  font-weight: 400;
+}
+
+.desktop-system-tray {
+  display: flex;
+  height: 30px;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 7px;
+  border: 0;
+  background: transparent;
+  padding: 0 10px;
+  box-shadow: none;
+  white-space: nowrap;
 }
 
 .main-world-object {
@@ -655,6 +779,16 @@ button:disabled {
   font-weight: 700;
   line-height: 1;
   letter-spacing: 0.01em;
+}
+
+.draggable-window-titlebar {
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.draggable-window-titlebar:active {
+  cursor: grabbing;
 }
 
 .win98-controls {
@@ -1110,6 +1244,24 @@ button:disabled {
     max-width: 36rem;
     margin-inline: auto;
     transform: none;
+  }
+
+  .draggable-window-titlebar {
+    cursor: default;
+    touch-action: auto;
+  }
+
+  .desktop-task-button {
+    min-width: 112px;
+    flex: 0 0 112px;
+  }
+
+  .desktop-resume-action {
+    display: none;
+  }
+
+  .desktop-system-tray {
+    padding-inline: 7px;
   }
 
   .main-world-fragment {

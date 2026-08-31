@@ -1,10 +1,20 @@
-import type { CSSProperties, ReactNode } from "react";
+"use client";
+
+import { motion, useDragControls } from "framer-motion";
+import type { PanInfo } from "framer-motion";
+import type { CSSProperties, PointerEvent, ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+
+type DesktopWindowInteraction = {
+  onActivate: () => void;
+};
 
 export type PositionedWindowProps = {
   id: string;
   className?: string;
   style?: CSSProperties;
   zIndex: number;
+  interaction?: DesktopWindowInteraction;
 };
 
 type Win98WindowProps = PositionedWindowProps & {
@@ -20,15 +30,76 @@ export function Win98Window({
   className = "",
   style,
   zIndex,
+  interaction,
   onClose
 }: Win98WindowProps) {
+  const windowRef = useRef<HTMLElement>(null);
+  const dragControls = useDragControls();
+  const [canDrag, setCanDrag] = useState(false);
+  const [dragConstraints, setDragConstraints] = useState({ left: 0, right: 0, top: 0, bottom: 0 });
+
+  const updateDragConstraints = useCallback(() => {
+    const windowElement = windowRef.current;
+    const desktop = windowElement?.parentElement;
+    if (!windowElement || !desktop) return;
+
+    const baseLeft = windowElement.offsetLeft;
+    const baseTop = windowElement.offsetTop;
+    const windowWidth = windowElement.offsetWidth;
+    const titleBarHeight =
+      windowElement.querySelector<HTMLElement>(".win98-titlebar")?.offsetHeight ?? 22;
+
+    setDragConstraints({
+      left: 100 - baseLeft - windowWidth,
+      right: desktop.clientWidth - 100 - baseLeft,
+      top: -baseTop,
+      bottom: desktop.clientHeight - titleBarHeight - baseTop,
+    });
+  }, []);
+
+  useEffect(() => {
+    const desktopPointer = window.matchMedia("(min-width: 768px)");
+    const updateDraggingMode = () => setCanDrag(desktopPointer.matches);
+    updateDraggingMode();
+    updateDragConstraints();
+    desktopPointer.addEventListener("change", updateDraggingMode);
+    window.addEventListener("resize", updateDragConstraints);
+    return () => {
+      desktopPointer.removeEventListener("change", updateDraggingMode);
+      window.removeEventListener("resize", updateDragConstraints);
+    };
+  }, [updateDragConstraints]);
+
+  const startDragging = (event: PointerEvent<HTMLElement>) => {
+    if (!canDrag || event.target instanceof Element && event.target.closest("button")) return;
+    interaction?.onActivate();
+    updateDragConstraints();
+    dragControls.start(event);
+  };
+
+  const keepWindowActive = (_event: MouseEvent | TouchEvent | PointerEvent, _info: PanInfo) => {
+    interaction?.onActivate();
+  };
+
   return (
-    <article
+    <motion.article
+      ref={windowRef}
       id={id}
-      className={`main-world-object win98-window ${className}`}
+      className={`main-world-object win98-window draggable-desktop-window ${className}`}
       style={{ ...style, zIndex }}
+      drag={canDrag}
+      dragListener={false}
+      dragControls={dragControls}
+      dragConstraints={dragConstraints}
+      dragElastic={0}
+      dragMomentum={false}
+      onDragStart={keepWindowActive}
+      onPointerDown={() => interaction?.onActivate()}
+      transformTemplate={(_, generatedTransform) =>
+        `${generatedTransform} rotate(var(--world-rotation))`
+      }
     >
-      <header className="win98-titlebar">
+      <header className="win98-titlebar draggable-window-titlebar" onPointerDown={startDragging}>
         <span className="min-w-0 flex-1 truncate">{title}</span>
         <span className="win98-controls">
           <span aria-hidden="true">_</span>
@@ -41,6 +112,6 @@ export function Win98Window({
         </span>
       </header>
       {children}
-    </article>
+    </motion.article>
   );
 }

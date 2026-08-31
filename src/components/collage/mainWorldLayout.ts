@@ -14,8 +14,8 @@ export type MainWorldWindowLayout = {
 export const mainWorldLayout = {
   // BACK — large image viewer
   beforeCode: {
-    x: 3,
-    y: 85,
+    x: 22,
+    y: 65,
     width: 32,
     height: 630,
     rotation: 0,
@@ -24,8 +24,8 @@ export const mainWorldLayout = {
 
   // BACK — journey peeking from upper-right
   journey: {
-    x: 54,
-    y: 46,
+    x: 64,
+    y: 18,
     width: 34,
     height: 420,
     rotation: 0,
@@ -34,17 +34,17 @@ export const mainWorldLayout = {
 
   // BACK / MID — editor extending through lower-right
   experience: {
-    x: 60,
-    y: 85,
+    x: 50,
+    y: 50,
     width: 36,
     height: 420,
     rotation: 0,
-    zIndex: 13,
+    zIndex: 35,
   },
 
   // MIDDLE — primary Open dialog
   projects: {
-    x: 23,
+    x: 33,
     y: 6,
     width: 50,
     height: 600,
@@ -54,8 +54,8 @@ export const mainWorldLayout = {
 
   // FRONT — small but still substantial
   about: {
-    x: 8,
-    y: 53,
+    x: 16,
+    y: 30,
     width: 20,
     height: 248,
     rotation: 0,
@@ -64,12 +64,12 @@ export const mainWorldLayout = {
 
   // FRONT — system dialog
   contact: {
-    x: 40,
-    y: 64,
+    x: 10,
+    y: 72,
     width: 18,
     height: 180,
     rotation: 0,
-    zIndex: 38,
+    zIndex: 22,
   },
 
   // FRONT — context menu crossing Projects edge

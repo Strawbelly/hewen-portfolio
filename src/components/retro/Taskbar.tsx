@@ -1,36 +1,98 @@
 "use client";
 
-const destinations = [
-  { label: "Projects", id: "projects" },
-  { label: "Experience", id: "experience" },
-  { label: "Journey", id: "journey" },
-  { label: "About", id: "about" },
-  { label: "Resume", id: "resume" }
-];
+import Image from "next/image";
+import { useEffect, useState } from "react";
+import {
+  projectPreviewTaskbarItem,
+  resumeTaskbarItem,
+  startTaskbarItem,
+  taskbarWindowItems,
+  type TaskbarItem,
+  type TaskbarWindowId,
+} from "@/components/retro/taskbarItems";
 
-export function Taskbar() {
+export type { TaskbarWindowId } from "@/components/retro/taskbarItems";
+
+type TaskbarProps = {
+  activeWindowId: TaskbarWindowId;
+  onWindowActivate: (id: TaskbarWindowId) => void;
+  projectPreviewLabel?: string;
+};
+
+export function Taskbar({ activeWindowId, onWindowActivate, projectPreviewLabel }: TaskbarProps) {
+  const [localTime, setLocalTime] = useState("--:--");
+  const taskbarWindows = projectPreviewLabel
+    ? [...taskbarWindowItems, { ...projectPreviewTaskbarItem, label: projectPreviewLabel }]
+    : taskbarWindowItems;
+
+  useEffect(() => {
+    const formatter = new Intl.DateTimeFormat(undefined, {
+      hour: "numeric",
+      minute: "2-digit",
+    });
+    const updateTime = () => setLocalTime(formatter.format(new Date()));
+    updateTime();
+    const timer = window.setInterval(updateTime, 30_000);
+    return () => window.clearInterval(timer);
+  }, []);
+
   return (
     <nav
-      aria-label="Portfolio navigation"
-      className="fixed inset-x-0 bottom-0 z-50 border-t-2 border-ink bg-chrome px-2 py-2 shadow-[0_-5px_0_rgba(21,21,21,0.08)]"
+      aria-label="Open desktop windows"
+      className="desktop-taskbar"
     >
-      <div className="mx-auto flex max-w-6xl items-center gap-2 overflow-x-auto">
-        <a
-          href="#top"
-          className="focus-ring shrink-0 border-2 border-ink bg-white px-3 py-1 font-mono text-xl leading-none shadow-hard"
-        >
-          start
-        </a>
-        {destinations.map((destination) => (
-          <a
-            key={destination.id}
-            href={`#${destination.id}`}
-            className="focus-ring shrink-0 border border-ink bg-chrome px-3 py-1 font-mono text-lg leading-none shadow-[2px_2px_0_#fff_inset,-2px_-2px_0_#808080_inset]"
+      <button type="button" className="desktop-start-button focus-ring" aria-label="Start">
+        <TaskbarIcon item={startTaskbarItem} />
+        {startTaskbarItem.label}
+      </button>
+
+      <div className="desktop-task-buttons">
+        {taskbarWindows.map((windowItem) => (
+          <button
+            key={windowItem.id}
+            type="button"
+            aria-pressed={activeWindowId === windowItem.id}
+            onClick={() => onWindowActivate(windowItem.id)}
+            className={`desktop-task-button focus-ring ${activeWindowId === windowItem.id ? "is-active" : ""}`}
           >
-            {destination.label}
-          </a>
+            <TaskbarIcon item={windowItem} />
+            <span>{windowItem.label}</span>
+          </button>
         ))}
       </div>
+
+      <a href="#resume" className="desktop-resume-action focus-ring">
+        <span className="desktop-taskbar-fallback-icon" aria-hidden="true">
+          {resumeTaskbarItem.fallbackIcon}
+        </span>
+        {resumeTaskbarItem.label}
+      </a>
+
+      <div className="desktop-system-tray" aria-label="System tray">
+        <time>{localTime}</time>
+      </div>
     </nav>
+  );
+}
+
+function TaskbarIcon({
+  item,
+}: {
+  item: Pick<TaskbarItem, "fallbackIcon" | "icon" | "pixelArt">;
+}) {
+  if (!item.icon) {
+    return <span className="desktop-taskbar-fallback-icon" aria-hidden="true">{item.fallbackIcon}</span>;
+  }
+
+  return (
+    <Image
+      src={item.icon}
+      alt=""
+      width={20}
+      height={20}
+      unoptimized
+      className={`desktop-taskbar-icon ${item.pixelArt ? "is-pixel-art" : ""}`}
+      aria-hidden="true"
+    />
   );
 }
