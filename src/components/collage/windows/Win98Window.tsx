@@ -5,12 +5,19 @@ import type { PanInfo } from "framer-motion";
 import type { CSSProperties, PointerEvent, ReactNode } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { TaskbarItemIcon } from "@/components/retro/TaskbarItemIcon";
-import { taskbarItemById, type TaskbarWindowId } from "@/components/retro/taskbarItems";
+import {
+  taskbarItemById,
+  type DesktopWindowStatus,
+  type TaskbarWindowId,
+} from "@/components/retro/taskbarItems";
 
 type DesktopWindowInteraction = {
   onActivate: () => void;
+  onMinimize: () => void;
+  onClose: () => void;
   windowId: TaskbarWindowId;
   isActive: boolean;
+  status: DesktopWindowStatus;
 };
 
 export type PositionedWindowProps = {
@@ -24,7 +31,6 @@ export type PositionedWindowProps = {
 type Win98WindowProps = PositionedWindowProps & {
   title: string;
   children: ReactNode;
-  onClose?: () => void;
 };
 
 export function Win98Window({
@@ -34,8 +40,7 @@ export function Win98Window({
   className = "",
   style,
   zIndex,
-  interaction,
-  onClose
+  interaction
 }: Win98WindowProps) {
   const windowRef = useRef<HTMLElement>(null);
   const dragControls = useDragControls();
@@ -89,6 +94,7 @@ export function Win98Window({
     <motion.article
       ref={windowRef}
       id={id}
+      hidden={interaction?.status !== "open"}
       className={`main-world-object win98-window draggable-desktop-window ${interaction?.isActive ? "is-active-window" : "is-inactive-window"} ${className}`}
       style={{ ...style, zIndex }}
       drag={canDrag}
@@ -112,13 +118,25 @@ export function Win98Window({
         ) : null}
         <span className="min-w-0 flex-1 truncate">{title}</span>
         <span className="win98-controls">
-          <span aria-hidden="true">_</span>
+          <button
+            type="button"
+            aria-label={`Minimize ${title}`}
+            onPointerDown={(event) => event.stopPropagation()}
+            onClick={(event) => {
+              event.stopPropagation();
+              interaction?.onMinimize();
+            }}
+          >_</button>
           <span aria-hidden="true">□</span>
-          {onClose ? (
-            <button type="button" aria-label={`Close ${title}`} onClick={onClose}>×</button>
-          ) : (
-            <span aria-hidden="true">×</span>
-          )}
+          <button
+            type="button"
+            aria-label={`Close ${title}`}
+            onPointerDown={(event) => event.stopPropagation()}
+            onClick={(event) => {
+              event.stopPropagation();
+              interaction?.onClose();
+            }}
+          >×</button>
         </span>
       </header>
       {children}

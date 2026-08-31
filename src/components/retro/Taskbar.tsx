@@ -13,7 +13,7 @@ import {
 export type { TaskbarWindowId } from "@/components/retro/taskbarItems";
 
 type TaskbarProps = {
-  activeWindowId: TaskbarWindowId;
+  activeWindowId: TaskbarWindowId | null;
   onWindowActivate: (id: TaskbarWindowId) => void;
   projectPreviewLabel?: string;
 };

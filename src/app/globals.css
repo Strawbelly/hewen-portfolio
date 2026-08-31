@@ -575,10 +575,22 @@ button:disabled {
 
 .world-canvas {
   position: relative;
+  isolation: isolate;
   overflow: hidden;
-  background:
-    linear-gradient(rgba(24, 29, 43, 0.12), rgba(24, 29, 43, 0.12)),
-    url("/assets/main-world/main-page-bg.jpg") center / cover no-repeat;
+  background: #182032;
+}
+
+.world-canvas::after {
+  content: "";
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+  background-image: url("/assets/main-world/main-page-bg.jpg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  filter: saturate(0.92) brightness(0.97);
+  pointer-events: none;
 }
 
 .world-canvas::before {
@@ -593,18 +605,19 @@ button:disabled {
 
 .main-world-desktop {
   --main-world-taskbar-height: 38px;
-  --retro-title-height: 31px;
-  --retro-title-size: 14px;
-  --retro-menu-size: 12px;
-  --retro-body-size: 13px;
-  --retro-small-size: 11px;
-  --retro-control-size: 12px;
-  --retro-project-name-size: 13px;
-  --retro-dialog-size: 14px;
+  --retro-title-height: 36px;
+  --retro-title-size: 16px;
+  --retro-menu-size: 14px;
+  --retro-body-size: 16px;
+  --retro-small-size: 13px;
+  --retro-control-size: 14px;
+  --retro-project-name-size: 15px;
+  --retro-dialog-size: 16px;
   --xp-title-active: #245edb;
   --xp-title-inactive: #245edb;
   --xp-title-highlight: #65a4f5;
   --xp-title-text: #fff;
+  --xp-window-radius: 15px;
   --xp-window-frame: #245edb;
   --xp-window-chrome: #ece9d8;
   --xp-menu-bg: #f3f0e5;
@@ -623,6 +636,89 @@ button:disabled {
   height: calc(100vh - var(--main-world-taskbar-height));
   margin: 0;
   overflow: visible;
+}
+
+.main-world-decorations {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+}
+
+.main-world-decoration {
+  position: absolute;
+  min-width: 64px;
+  max-width: 360px;
+  cursor: move;
+  pointer-events: auto;
+  touch-action: none;
+  user-select: none;
+}
+
+.main-world-decoration-image {
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.main-world-decoration-drag-surface {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  border: 0;
+  background: transparent;
+  cursor: move;
+  touch-action: none;
+}
+
+.main-world-decoration.is-selected::after {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset: -4px;
+  border: 1px dashed rgba(36, 94, 219, 0.9);
+  pointer-events: none;
+}
+
+.main-world-decoration-scale-handle {
+  position: absolute;
+  z-index: 3;
+  width: 10px;
+  height: 10px;
+  border: 1px solid #fff;
+  background: #245edb;
+  padding: 0;
+  touch-action: none;
+}
+
+.main-world-decoration-scale-handle.top-left {
+  top: -8px;
+  left: -8px;
+  cursor: nwse-resize;
+}
+
+.main-world-decoration-scale-handle.top-right {
+  top: -8px;
+  right: -8px;
+  cursor: nesw-resize;
+}
+
+.main-world-decoration-scale-handle.bottom-left {
+  bottom: -8px;
+  left: -8px;
+  cursor: nesw-resize;
+}
+
+.main-world-decoration-scale-handle.bottom-right {
+  right: -8px;
+  bottom: -8px;
+  cursor: nwse-resize;
+}
+
+.main-world-decoration > img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .desktop-taskbar {
@@ -670,9 +766,10 @@ button:disabled {
   min-width: 98px;
   justify-content: center;
   border-color: #246523;
+  border-radius: 0 10px 10px 0;
   background: #3b9738;
   box-shadow: 1px 1px 0 #83d477 inset, -1px -1px 0 #1f6221 inset;
-  font-size: 18px;
+  font-size: 16px;
   font-style: italic;
 }
 
@@ -687,7 +784,7 @@ button:disabled {
   display: flex;
   min-width: 0;
   flex: 1 1 auto;
-  gap: 3px;
+  gap: 0;
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -771,16 +868,19 @@ button:disabled {
 }
 
 .win98-window {
+  isolation: isolate;
   overflow: hidden;
   border: 1px solid var(--xp-border-dark);
-  border-radius: 12px 12px 7px 7px;
+  border-radius: var(--xp-window-radius);
   background: var(--xp-window-frame);
-  padding: 1px;
+  background-clip: padding-box;
+  padding: 0;
   color: #111;
   font-family: Arial, Helvetica, sans-serif;
   font-size: var(--retro-body-size);
+  line-height: 1.35;
   box-shadow:
-    0 0 0 3px rgba(255, 255, 255, 0.38),
+    0 0 0 3px rgb(255, 255, 255, 0.3),
     2px 2px 2px rgba(20, 35, 70, 0.14);
 }
 
@@ -788,16 +888,17 @@ button:disabled {
   display: flex;
   height: var(--retro-title-height);
   align-items: center;
-  gap: 4px;
-  border-top: 1px solid var(--xp-title-highlight);
-  border-radius: 10px 10px 0 0;
+  gap: 8px;
+  border: 0;
+  border-radius: 0;
   background: var(--xp-title-inactive);
-  padding: 1px 2px 2px 3px;
+  padding: 0 9px;
   color: var(--xp-title-text);
   font-size: var(--retro-title-size);
   font-weight: 700;
   line-height: 1;
   letter-spacing: 0.01em;
+  box-shadow: 0 1px 0 var(--xp-title-highlight) inset;
 }
 
 .is-active-window .win98-titlebar {
@@ -823,6 +924,7 @@ button:disabled {
 
 .win98-controls {
   display: flex;
+  align-items: center;
   gap: 2px;
 }
 
@@ -854,7 +956,7 @@ button:disabled {
 
 .win98-menubar,
 .open-file-menu {
-  height: 23px;
+  height: 25px;
   border-bottom: 1px solid #aaa694;
   background: var(--xp-menu-bg);
   padding: 4px 7px;
@@ -885,6 +987,7 @@ button:disabled {
   min-width: 62px;
   padding: 3px 8px;
   font-size: var(--retro-control-size);
+  line-height: 1.2;
 }
 
 .win98-button:active,
@@ -905,6 +1008,8 @@ button:disabled {
   background: #fff;
   padding: 3px 5px;
   box-shadow: 1px 1px 0 #777 inset;
+  font-size: var(--retro-control-size);
+  line-height: 1.25;
 }
 
 .win98-combo > :last-child {
@@ -918,6 +1023,7 @@ button:disabled {
   flex: 1;
   background: transparent;
   outline: none;
+  font-size: var(--retro-control-size);
 }
 
 .open-file-dialog {
@@ -934,10 +1040,11 @@ button:disabled {
   grid-template-columns: auto minmax(0, 1fr) 23px 23px;
   align-items: center;
   gap: 5px;
+  font-size: var(--retro-control-size);
 }
 
 .open-file-menu {
-  height: 22px;
+  height: 24px;
   margin-top: 4px;
   border-top: 1px solid #fff;
   padding-left: 2px;
@@ -964,7 +1071,7 @@ button:disabled {
   align-items: center;
   gap: 6px;
   font-size: var(--retro-project-name-size);
-  line-height: 1.12;
+  line-height: 1.25;
   text-align: center;
 }
 
@@ -996,6 +1103,7 @@ button:disabled {
   grid-template-columns: 72px minmax(0, 1fr) 68px;
   align-items: center;
   gap: 5px 7px;
+  font-size: var(--retro-control-size);
 }
 
 .image-viewer-app,
@@ -1013,7 +1121,7 @@ button:disabled {
   background: #d9dce0;
   padding: 5px 8px;
   font-size: var(--retro-menu-size);
-  line-height: 1;
+  line-height: 1.1;
 }
 
 .image-viewer-viewport {
@@ -1089,8 +1197,26 @@ button:disabled {
   background: #fff;
   padding: 25px 28px;
   font-family: "Courier New", monospace;
-  font-size: 14px;
+  font-size: 15px;
+  line-height: 1.4;
   box-shadow: 2px 2px 0 #888;
+}
+
+.editor-document > p:first-child {
+  font-size: 16px;
+}
+
+.editor-document > p:nth-child(2) {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.editor-document > p:nth-child(3) {
+  font-size: 15px;
+}
+
+.editor-document > p:nth-child(4) {
+  font-size: 13px;
 }
 
 .journey-log-app {
@@ -1105,7 +1231,7 @@ button:disabled {
   padding: 13px;
   font-family: "Courier New", monospace;
   font-size: var(--retro-body-size);
-  line-height: 1.3;
+  line-height: 1.45;
   white-space: normal;
 }
 
@@ -1121,7 +1247,12 @@ button:disabled {
   padding: 10px;
   font-family: "Courier New", monospace;
   font-size: var(--retro-body-size);
-  line-height: 1.3;
+  line-height: 1.45;
+}
+
+.about-notepad-content strong {
+  font-size: 18px;
+  font-weight: 700;
 }
 
 .about-notepad-content .rabbit-frame {
@@ -1138,6 +1269,7 @@ button:disabled {
   font-family: "Courier New", monospace;
   font-size: var(--retro-dialog-size);
   text-align: center;
+  line-height: 1.4;
 }
 
 .contact-system-dialog > div {
@@ -1181,7 +1313,7 @@ button:disabled {
 
 .project-preview-app article small { color: #666; font-size: var(--retro-small-size); letter-spacing: 0.14em; }
 .project-preview-app article h2 { margin-top: 6px; color: #1534a3; font-family: "Courier New", monospace; font-size: 24px; font-weight: 700; }
-.project-preview-app article p { margin-top: 9px; font-family: "Courier New", monospace; font-size: 14px; }
+.project-preview-app article p { margin-top: 9px; font-family: "Courier New", monospace; font-size: 16px; line-height: 1.45; }
 .project-preview-app article ul { margin-top: 14px; font-family: "Courier New", monospace; font-size: var(--retro-body-size); line-height: 1.65; }
 .project-preview-tech { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 12px; }
 .project-preview-tech span { border: 1px solid #1534a3; background: #dfe8ff; padding: 3px 6px; color: #1534a3; font-size: var(--retro-small-size); }
@@ -1258,6 +1390,10 @@ button:disabled {
 }
 
 @media (max-width: 767px) {
+  .main-world-decorations {
+    display: none;
+  }
+
   .main-world-desktop {
     overflow: visible;
   }

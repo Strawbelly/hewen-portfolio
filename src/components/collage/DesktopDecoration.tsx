@@ -1,0 +1,129 @@
+"use client";
+
+import { motion, useDragControls } from "framer-motion";
+import Image from "next/image";
+import type { PointerEvent, RefObject } from "react";
+import { useRef, useState } from "react";
+import type { MainWorldDecorationLayout } from "@/components/collage/mainWorldDecorationsLayout";
+
+type DesktopDecorationProps = {
+  layout: MainWorldDecorationLayout;
+  constraintsRef: RefObject<HTMLDivElement | null>;
+  isSelected: boolean;
+  onSelect: (id: string) => void;
+};
+
+type ResizeStart = {
+  pointerX: number;
+  width: number;
+  direction: -1 | 1;
+};
+
+export function DesktopDecoration({
+  layout,
+  constraintsRef,
+  isSelected,
+  onSelect,
+}: DesktopDecorationProps) {
+  const { id, src, imageWidth, imageHeight, x, y, width, rotation } = layout;
+  const decorationRef = useRef<HTMLDivElement>(null);
+  const resizeStart = useRef<ResizeStart | null>(null);
+  const dragControls = useDragControls();
+  const [resizedWidth, setResizedWidth] = useState<number | null>(null);
+  const [layer, setLayer] = useState<"back" | "front">("front");
+
+  const startResize = (event: PointerEvent<HTMLButtonElement>, direction: -1 | 1) => {
+    event.stopPropagation();
+    onSelect(id);
+    const currentWidth = decorationRef.current?.getBoundingClientRect().width;
+    if (!currentWidth) return;
+    event.currentTarget.setPointerCapture(event.pointerId);
+    resizeStart.current = { pointerX: event.clientX, width: currentWidth, direction };
+  };
+
+  const resize = (event: PointerEvent<HTMLButtonElement>) => {
+    if (!resizeStart.current) return;
+    const nextWidth =
+      resizeStart.current.width +
+      (event.clientX - resizeStart.current.pointerX) * resizeStart.current.direction;
+    setResizedWidth(Math.max(64, Math.min(nextWidth, 360)));
+  };
+
+  const stopResize = (event: PointerEvent<HTMLButtonElement>) => {
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    resizeStart.current = null;
+  };
+
+  return (
+    <motion.div
+      ref={decorationRef}
+      className={`main-world-decoration ${isSelected ? "is-selected" : ""}`}
+      style={{
+        left: `${x}%`,
+        top: `${y}%`,
+        aspectRatio: `${imageWidth} / ${imageHeight}`,
+        width: resizedWidth ?? width,
+        rotate: rotation,
+        zIndex: layer === "front" ? 100 : 0,
+      }}
+      drag
+      dragListener={false}
+      dragControls={dragControls}
+      dragConstraints={constraintsRef}
+      dragElastic={0}
+      dragMomentum={false}
+    >
+      <Image
+        src={src}
+        alt=""
+        fill
+        sizes="(max-width: 1280px) 15vw, 220px"
+        draggable={false}
+        className="main-world-decoration-image"
+      />
+      <button
+        type="button"
+        className="main-world-decoration-drag-surface"
+        aria-label="Move decoration"
+        onPointerDown={(event) => {
+          onSelect(id);
+          dragControls.start(event);
+        }}
+        onDoubleClick={(event) => {
+          event.stopPropagation();
+          setLayer((current) => current === "back" ? "front" : "back");
+        }}
+      />
+      {isSelected ? (
+        <>
+          {(["top-left", "bottom-left"] as const).map((corner) => (
+            <button
+              key={corner}
+              type="button"
+              className={`main-world-decoration-scale-handle ${corner}`}
+              aria-label="Resize decoration"
+              onPointerDown={(event) => startResize(event, -1)}
+              onPointerMove={resize}
+              onPointerUp={stopResize}
+              onPointerCancel={stopResize}
+            />
+          ))}
+          {(["top-right", "bottom-right"] as const).map((corner) => (
+            <button
+              key={corner}
+              type="button"
+              className={`main-world-decoration-scale-handle ${corner}`}
+              aria-label="Resize decoration"
+              onPointerDown={(event) => startResize(event, 1)}
+              onPointerMove={resize}
+              onPointerUp={stopResize}
+              onPointerCancel={stopResize}
+            />
+          ))}
+        </>
+      ) : null}
+    </motion.div>
+  );
+}

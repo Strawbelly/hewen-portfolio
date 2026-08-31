@@ -7,6 +7,8 @@ export type TaskbarWindowId =
   | "contact"
   | "projectPreview";
 
+export type DesktopWindowStatus = "open" | "minimized" | "closed";
+
 export type TaskbarIconConfig = {
   fallbackIcon: string;
   icon?: string;

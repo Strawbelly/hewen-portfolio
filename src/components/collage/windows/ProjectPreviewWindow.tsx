@@ -4,12 +4,11 @@ import { Win98Window } from "@/components/collage/windows/Win98Window";
 
 type ProjectPreviewWindowProps = PositionedWindowProps & {
   project: ProjectOption;
-  onClose: () => void;
 };
 
-export function ProjectPreviewWindow({ project, onClose, ...windowProps }: ProjectPreviewWindowProps) {
+export function ProjectPreviewWindow({ project, ...windowProps }: ProjectPreviewWindowProps) {
   return (
-    <Win98Window {...windowProps} title={`${project.title} — Project Preview`} onClose={onClose}>
+    <Win98Window {...windowProps} title={`${project.title} — Project Preview`}>
       <div className="project-preview-app">
         <div className="win98-menubar">Project&nbsp;&nbsp; View&nbsp;&nbsp; Engineering Notes&nbsp;&nbsp; Help</div>
         <article>

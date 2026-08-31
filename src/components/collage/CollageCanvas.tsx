@@ -4,6 +4,8 @@ import type { CSSProperties } from "react";
 import { useCallback, useRef, useState } from "react";
 import { mainWorldLayout, type MainWorldWindowLayout } from "@/components/collage/mainWorldLayout";
 import { AboutNotepad } from "@/components/collage/windows/AboutNotepad";
+import { DesktopDecoration } from "@/components/collage/DesktopDecoration";
+import { mainWorldDecorationsLayout } from "@/components/collage/mainWorldDecorationsLayout";
 import { BeforeCodeImageViewer } from "@/components/collage/windows/BeforeCodeImageViewer";
 import { ContactSystemDialog } from "@/components/collage/windows/ContactSystemDialog";
 import { ExperienceEditor } from "@/components/collage/windows/ExperienceEditor";
@@ -12,7 +14,7 @@ import { ProjectPreviewWindow } from "@/components/collage/windows/ProjectPrevie
 import { ProjectsOpenDialog } from "@/components/collage/windows/ProjectsOpenDialog";
 import { projectOptions, type ProjectOption } from "@/components/collage/windows/projectOptions";
 import { Taskbar } from "@/components/retro/Taskbar";
-import type { TaskbarWindowId } from "@/components/retro/taskbarItems";
+import type { DesktopWindowStatus, TaskbarWindowId } from "@/components/retro/taskbarItems";
 
 type WindowStyle = CSSProperties & {
   "--world-x": number;
@@ -34,7 +36,6 @@ const initialWindowZ = Object.fromEntries(
   Object.entries(mainWorldLayout).map(([id, layout]) => [id, layout.zIndex])
 ) as Record<string, number>;
 
-const highestInitialZ = Math.max(...Object.values(initialWindowZ));
 const desktopWindowIds: TaskbarWindowId[] = [
   "projects",
   "experience",
@@ -47,100 +48,199 @@ const initialActiveWindowId = desktopWindowIds.reduce((front, id) =>
   initialWindowZ[id] > initialWindowZ[front] ? id : front
 );
 
+type DesktopWindowState = {
+  status: DesktopWindowStatus;
+  zIndex: number;
+};
+
+type DesktopWindowStates = Record<TaskbarWindowId, DesktopWindowState>;
+
+const allWindowIds: TaskbarWindowId[] = [...desktopWindowIds, "projectPreview"];
+const initialWindowStates = Object.fromEntries(
+  allWindowIds.map((id) => [
+    id,
+    {
+      status: id === "projectPreview" ? "closed" : "open",
+      zIndex: initialWindowZ[id],
+    },
+  ])
+) as DesktopWindowStates;
+
+const findTopOpenWindow = (states: DesktopWindowStates): TaskbarWindowId | null => {
+  const openWindows = allWindowIds.filter((id) => states[id].status === "open");
+  return openWindows.reduce<TaskbarWindowId | null>((front, id) => {
+    if (!front || states[id].zIndex > states[front].zIndex) return id;
+    return front;
+  }, null);
+};
+
 const placement = (
   id: TaskbarWindowId,
   layout: MainWorldWindowLayout,
-  zIndexes: Record<string, number>,
-  bringToFront: (id: TaskbarWindowId) => void,
-  activeWindowId: TaskbarWindowId
+  state: DesktopWindowState,
+  focusWindow: (id: TaskbarWindowId) => void,
+  minimizeWindow: (id: TaskbarWindowId) => void,
+  closeWindow: (id: TaskbarWindowId) => void,
+  activeWindowId: TaskbarWindowId | null
 ) => ({
   style: windowStyle(layout),
-  zIndex: zIndexes[id] ?? layout.zIndex,
+  zIndex: state.zIndex,
   interaction: {
-    onActivate: () => bringToFront(id),
+    onActivate: () => focusWindow(id),
+    onMinimize: () => minimizeWindow(id),
+    onClose: () => closeWindow(id),
     windowId: id,
     isActive: activeWindowId === id,
+    status: state.status,
   },
 });
 
 export function CollageCanvas() {
-  const highestZ = useRef(highestInitialZ);
+  const decorationBoundsRef = useRef<HTMLDivElement>(null);
+  const [selectedDecorationId, setSelectedDecorationId] = useState<string | null>(null);
   const activeWindowRef = useRef<TaskbarWindowId>(initialActiveWindowId);
-  const [zIndexes, setZIndexes] = useState(initialWindowZ);
-  const [activeWindowId, setActiveWindowId] = useState<TaskbarWindowId>(initialActiveWindowId);
+  const windowStatesRef = useRef<DesktopWindowStates>(initialWindowStates);
+  const [windowStates, setWindowStates] = useState<DesktopWindowStates>(initialWindowStates);
+  const [activeWindowId, setActiveWindowId] = useState<TaskbarWindowId | null>(initialActiveWindowId);
   const [selectedProjectId, setSelectedProjectId] = useState(projectOptions[0].id);
   const [openedProject, setOpenedProject] = useState<ProjectOption | null>(null);
   const selectedProject =
     projectOptions.find((project) => project.id === selectedProjectId) ?? projectOptions[0];
 
-  const bringToFront = useCallback((id: TaskbarWindowId) => {
-    if (activeWindowRef.current === id) return;
-    highestZ.current += 1;
-    const nextZ = highestZ.current;
-    activeWindowRef.current = id;
-    setActiveWindowId(id);
-    setZIndexes((current) => ({ ...current, [id]: nextZ }));
+  const commitWindowStates = useCallback((nextStates: DesktopWindowStates) => {
+    windowStatesRef.current = nextStates;
+    setWindowStates(nextStates);
   }, []);
 
+  const focusWindow = useCallback((id: TaskbarWindowId) => {
+    const current = windowStatesRef.current;
+    if (activeWindowRef.current === id && current[id].status === "open") return;
+
+    const orderedWindowIds = [...allWindowIds].sort(
+      (first, second) => current[first].zIndex - current[second].zIndex
+    );
+    const normalizedStates = { ...current };
+    orderedWindowIds.forEach((windowId, index) => {
+      normalizedStates[windowId] = {
+        ...current[windowId],
+        zIndex: index + 1,
+      };
+    });
+    normalizedStates[id] = {
+      ...normalizedStates[id],
+      status: "open",
+      zIndex: allWindowIds.length + 1,
+    };
+
+    commitWindowStates(normalizedStates);
+    activeWindowRef.current = id;
+    setActiveWindowId(id);
+  }, [commitWindowStates]);
+
+  const changeWindowStatus = useCallback((id: TaskbarWindowId, status: DesktopWindowStatus) => {
+    const current = windowStatesRef.current;
+    const nextStates: DesktopWindowStates = {
+      ...current,
+      [id]: { ...current[id], status },
+    };
+    commitWindowStates(nextStates);
+
+    if (activeWindowRef.current === id) {
+      const nextActiveWindow = findTopOpenWindow(nextStates);
+      activeWindowRef.current = nextActiveWindow ?? initialActiveWindowId;
+      setActiveWindowId(nextActiveWindow);
+    }
+  }, [commitWindowStates]);
+
+  const minimizeWindow = useCallback(
+    (id: TaskbarWindowId) => changeWindowStatus(id, "minimized"),
+    [changeWindowStatus]
+  );
+
+  const closeWindow = useCallback(
+    (id: TaskbarWindowId) => changeWindowStatus(id, "closed"),
+    [changeWindowStatus]
+  );
+
+  const handleTaskbarWindow = useCallback((id: TaskbarWindowId) => {
+    const state = windowStatesRef.current[id];
+    if (state.status === "open" && activeWindowRef.current === id) {
+      minimizeWindow(id);
+      return;
+    }
+    focusWindow(id);
+  }, [focusWindow, minimizeWindow]);
+
   const openProject = () => {
-    bringToFront("projectPreview");
     setOpenedProject(selectedProject);
+    focusWindow("projectPreview");
   };
 
-  const closeProject = () => {
+  const dismissProjectPreview = () => {
+    closeWindow("projectPreview");
     setOpenedProject(null);
-    const nextActiveWindow = desktopWindowIds.reduce((front, id) =>
-      (zIndexes[id] ?? 0) > (zIndexes[front] ?? 0) ? id : front
-    );
-    activeWindowRef.current = nextActiveWindow;
-    setActiveWindowId(nextActiveWindow);
   };
 
   return (
-    <div id="top" className="world-canvas main-world-desktop">
+    <div
+      id="top"
+      className="world-canvas main-world-desktop"
+      onPointerDownCapture={() => setSelectedDecorationId(null)}
+    >
       <main className="main-world-pile" aria-label="Hewen's editorial desktop collage">
+        <div ref={decorationBoundsRef} className="main-world-decorations">
+          {mainWorldDecorationsLayout.map((decoration) => (
+            <DesktopDecoration
+              key={decoration.id}
+              layout={decoration}
+              constraintsRef={decorationBoundsRef}
+              isSelected={selectedDecorationId === decoration.id}
+              onSelect={setSelectedDecorationId}
+            />
+          ))}
+        </div>
+
         <BeforeCodeImageViewer
           id="before-code"
-          {...placement("beforeCode", mainWorldLayout.beforeCode, zIndexes, bringToFront, activeWindowId)}
+          {...placement("beforeCode", mainWorldLayout.beforeCode, windowStates.beforeCode, focusWindow, minimizeWindow, closeWindow, activeWindowId)}
         />
         <JourneyLogWindow
           id="journey"
-          {...placement("journey", mainWorldLayout.journey, zIndexes, bringToFront, activeWindowId)}
+          {...placement("journey", mainWorldLayout.journey, windowStates.journey, focusWindow, minimizeWindow, closeWindow, activeWindowId)}
         />
         <ExperienceEditor
           id="experience"
-          {...placement("experience", mainWorldLayout.experience, zIndexes, bringToFront, activeWindowId)}
+          {...placement("experience", mainWorldLayout.experience, windowStates.experience, focusWindow, minimizeWindow, closeWindow, activeWindowId)}
         />
         <ProjectsOpenDialog
           id="projects"
-          {...placement("projects", mainWorldLayout.projects, zIndexes, bringToFront, activeWindowId)}
+          {...placement("projects", mainWorldLayout.projects, windowStates.projects, focusWindow, minimizeWindow, closeWindow, activeWindowId)}
           projects={projectOptions}
           selectedProject={selectedProject}
           onSelect={setSelectedProjectId}
           onOpen={openProject}
-          onCancel={() => setOpenedProject(null)}
+          onCancel={dismissProjectPreview}
         />
         <AboutNotepad
           id="about"
-          {...placement("about", mainWorldLayout.about, zIndexes, bringToFront, activeWindowId)}
+          {...placement("about", mainWorldLayout.about, windowStates.about, focusWindow, minimizeWindow, closeWindow, activeWindowId)}
         />
         <ContactSystemDialog
           id="contact"
-          {...placement("contact", mainWorldLayout.contact, zIndexes, bringToFront, activeWindowId)}
+          {...placement("contact", mainWorldLayout.contact, windowStates.contact, focusWindow, minimizeWindow, closeWindow, activeWindowId)}
         />
 
         {openedProject ? (
           <ProjectPreviewWindow
             id="project-preview"
-            {...placement("projectPreview", mainWorldLayout.projectPreview, zIndexes, bringToFront, activeWindowId)}
+            {...placement("projectPreview", mainWorldLayout.projectPreview, windowStates.projectPreview, focusWindow, minimizeWindow, closeWindow, activeWindowId)}
             project={openedProject}
-            onClose={closeProject}
           />
         ) : null}
       </main>
       <Taskbar
         activeWindowId={activeWindowId}
-        onWindowActivate={bringToFront}
+        onWindowActivate={handleTaskbarWindow}
         projectPreviewLabel={openedProject?.title}
       />
     </div>
