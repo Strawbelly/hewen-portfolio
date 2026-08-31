@@ -6,6 +6,9 @@
   --font-sans: "Trebuchet MS", Arial, sans-serif;
   --font-display: Georgia, "Times New Roman", serif;
   --font-mono: "Courier New", monospace;
+  --font-system: Tahoma, Verdana, sans-serif;
+  --font-engineering: var(--font-ibm-plex-mono), "Courier New", monospace;
+  --font-personal: "Trebuchet MS", Arial, sans-serif;
 }
 
 * {
@@ -606,7 +609,7 @@ button:disabled {
 .main-world-desktop {
   --main-world-taskbar-height: 38px;
   --retro-title-height: 36px;
-  --retro-title-size: 16px;
+  --retro-title-size: 15px;
   --retro-menu-size: 14px;
   --retro-body-size: 16px;
   --retro-small-size: 13px;
@@ -620,6 +623,7 @@ button:disabled {
   --xp-window-radius: 15px;
   --xp-window-frame: #245edb;
   --xp-window-chrome: #ece9d8;
+  --xp-control-surface: #F2EFE6;
   --xp-menu-bg: #f3f0e5;
   --xp-border-dark: #174ea6;
   --xp-border-light: #8db8ef;
@@ -735,7 +739,7 @@ button:disabled {
   background: #245edb;
   padding: 2px 4px;
   color: #fff;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-system);
   font-size: 14px;
   box-shadow: 0 -1px 0 #0b3aa4;
 }
@@ -752,6 +756,7 @@ button:disabled {
   border-radius: 2px;
   padding: 0 10px;
   color: #fff;
+  font-family: var(--font-system);
   font-weight: 700;
   line-height: 1;
   text-decoration: none;
@@ -876,7 +881,7 @@ button:disabled {
   background-clip: padding-box;
   padding: 0;
   color: #111;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-system);
   font-size: var(--retro-body-size);
   line-height: 1.35;
   box-shadow:
@@ -939,7 +944,7 @@ button:disabled {
   background: linear-gradient(180deg, #75b5ff, #1764d4);
   padding: 0;
   color: #fff;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-system);
   font-size: var(--retro-control-size);
   font-weight: 700;
   line-height: 1;
@@ -961,6 +966,7 @@ button:disabled {
   background: var(--xp-menu-bg);
   padding: 4px 7px;
   font-size: var(--retro-menu-size);
+  font-family: var(--font-system);
   line-height: 1;
 }
 
@@ -968,8 +974,9 @@ button:disabled {
 .win98-icon-button {
   border: 1px solid #151515;
   border-radius: 0;
-  background: #c9cdd2;
+  background: var(--xp-control-surface);
   color: #151515;
+  font-family: var(--font-system);
   box-shadow:
     1px 1px 0 #fff inset,
     -1px -1px 0 #777 inset;
@@ -1009,6 +1016,7 @@ button:disabled {
   padding: 3px 5px;
   box-shadow: 1px 1px 0 #777 inset;
   font-size: var(--retro-control-size);
+  font-family: var(--font-system);
   line-height: 1.25;
 }
 
@@ -1023,6 +1031,7 @@ button:disabled {
   flex: 1;
   background: transparent;
   outline: none;
+  font-family: var(--font-system);
   font-size: var(--retro-control-size);
 }
 
@@ -1031,7 +1040,7 @@ button:disabled {
   height: calc(100% - var(--retro-title-height));
   flex-direction: column;
   overflow: hidden;
-  background: #c9cdd2;
+  background: var(--xp-control-surface);
   padding: 7px;
 }
 
@@ -1070,6 +1079,7 @@ button:disabled {
   flex-direction: column;
   align-items: center;
   gap: 6px;
+  font-family: var(--font-engineering);
   font-size: var(--retro-project-name-size);
   line-height: 1.25;
   text-align: center;
@@ -1111,7 +1121,7 @@ button:disabled {
 .project-preview-app {
   height: calc(100% - var(--retro-title-height));
   overflow: hidden;
-  background: #c9cdd2;
+  background: var(--xp-control-surface);
 }
 
 .image-viewer-toolbar,
@@ -1120,6 +1130,7 @@ button:disabled {
   border-bottom: 1px solid #7e848c;
   background: #d9dce0;
   padding: 5px 8px;
+  font-family: var(--font-system);
   font-size: var(--retro-menu-size);
   line-height: 1.1;
 }
@@ -1144,13 +1155,14 @@ button:disabled {
     linear-gradient(315deg, rgba(21, 52, 163, 0.08) 25%, transparent 25%) 0 0 / 18px 18px,
     #dce9ed;
   color: #1534a3;
-  font-family: var(--font-mono);
+  font-family: var(--font-personal);
   text-align: center;
   box-shadow: 2px 2px 0 #333;
 }
 
 .image-placeholder-canvas small {
   margin-top: 7px;
+  font-family: var(--font-engineering);
   font-size: var(--retro-small-size);
 }
 
@@ -1170,6 +1182,7 @@ button:disabled {
   grid-template-columns: 1fr auto auto;
   gap: 2px;
   padding: 2px 3px;
+  font-family: var(--font-system);
   font-size: var(--retro-small-size);
 }
 
@@ -1196,27 +1209,31 @@ button:disabled {
   border: 1px solid #888;
   background: #fff;
   padding: 25px 28px;
-  font-family: "Courier New", monospace;
-  font-size: 15px;
-  line-height: 1.4;
+  font-family: var(--font-engineering);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
   box-shadow: 2px 2px 0 #888;
 }
 
 .editor-document > p:first-child {
-  font-size: 16px;
+  font-size: 17px;
+  font-weight: 500;
 }
 
 .editor-document > p:nth-child(2) {
   font-size: 17px;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .editor-document > p:nth-child(3) {
   font-size: 15px;
+  font-weight: 400;
 }
 
 .editor-document > p:nth-child(4) {
-  font-size: 13px;
+  font-size: 14px;
+  font-weight: 400;
 }
 
 .journey-log-app {
@@ -1229,9 +1246,9 @@ button:disabled {
   height: calc(100% - 21px);
   overflow: hidden;
   padding: 13px;
-  font-family: "Courier New", monospace;
+  font-family: var(--font-personal);
   font-size: var(--retro-body-size);
-  line-height: 1.45;
+  line-height: 1.5;
   white-space: normal;
 }
 
@@ -1245,9 +1262,9 @@ button:disabled {
   display: flex;
   gap: 10px;
   padding: 10px;
-  font-family: "Courier New", monospace;
+  font-family: var(--font-personal);
   font-size: var(--retro-body-size);
-  line-height: 1.45;
+  line-height: 1.5;
 }
 
 .about-notepad-content strong {
@@ -1264,9 +1281,9 @@ button:disabled {
   display: grid;
   height: calc(100% - var(--retro-title-height));
   place-items: center;
-  background: #c9cdd2;
+  background: var(--xp-control-surface);
   padding: 9px;
-  font-family: "Courier New", monospace;
+  font-family: var(--font-system);
   font-size: var(--retro-dialog-size);
   text-align: center;
   line-height: 1.4;
@@ -1282,9 +1299,9 @@ button:disabled {
   height: calc(var(--world-height) * 1px);
   flex-direction: column;
   border: 1px solid #111;
-  background: #c9cdd2;
+  background: var(--xp-control-surface);
   padding: 3px;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-system);
   font-size: var(--retro-menu-size);
   box-shadow:
     3px 3px 0 rgba(17, 17, 17, 0.32),
@@ -1311,12 +1328,12 @@ button:disabled {
   box-shadow: 1px 1px 0 #777 inset;
 }
 
-.project-preview-app article small { color: #666; font-size: var(--retro-small-size); letter-spacing: 0.14em; }
-.project-preview-app article h2 { margin-top: 6px; color: #1534a3; font-family: "Courier New", monospace; font-size: 24px; font-weight: 700; }
-.project-preview-app article p { margin-top: 9px; font-family: "Courier New", monospace; font-size: 16px; line-height: 1.45; }
-.project-preview-app article ul { margin-top: 14px; font-family: "Courier New", monospace; font-size: var(--retro-body-size); line-height: 1.65; }
+.project-preview-app article small { color: #666; font-family: var(--font-engineering); font-size: var(--retro-small-size); letter-spacing: 0.14em; }
+.project-preview-app article h2 { margin-top: 6px; color: #1534a3; font-family: var(--font-engineering); font-size: 18px; font-weight: 600; }
+.project-preview-app article p { margin-top: 9px; font-family: var(--font-engineering); font-size: 16px; font-weight: 400; line-height: 1.5; }
+.project-preview-app article ul { margin-top: 14px; font-family: var(--font-engineering); font-size: var(--retro-body-size); font-weight: 400; line-height: 1.5; }
 .project-preview-tech { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 12px; }
-.project-preview-tech span { border: 1px solid #1534a3; background: #dfe8ff; padding: 3px 6px; color: #1534a3; font-size: var(--retro-small-size); }
+.project-preview-tech span { border: 1px solid #1534a3; background: #dfe8ff; padding: 3px 6px; color: #1534a3; font-family: var(--font-engineering); font-size: var(--retro-small-size); font-weight: 500; }
 .project-preview-app footer { border-top: 1px solid #777; padding: 6px 8px; text-align: right; }
 
 .scroll-zone {
