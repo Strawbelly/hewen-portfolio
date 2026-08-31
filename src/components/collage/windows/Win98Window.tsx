@@ -4,9 +4,13 @@ import { motion, useDragControls } from "framer-motion";
 import type { PanInfo } from "framer-motion";
 import type { CSSProperties, PointerEvent, ReactNode } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { TaskbarItemIcon } from "@/components/retro/TaskbarItemIcon";
+import { taskbarItemById, type TaskbarWindowId } from "@/components/retro/taskbarItems";
 
 type DesktopWindowInteraction = {
   onActivate: () => void;
+  windowId: TaskbarWindowId;
+  isActive: boolean;
 };
 
 export type PositionedWindowProps = {
@@ -85,7 +89,7 @@ export function Win98Window({
     <motion.article
       ref={windowRef}
       id={id}
-      className={`main-world-object win98-window draggable-desktop-window ${className}`}
+      className={`main-world-object win98-window draggable-desktop-window ${interaction?.isActive ? "is-active-window" : "is-inactive-window"} ${className}`}
       style={{ ...style, zIndex }}
       drag={canDrag}
       dragListener={false}
@@ -100,6 +104,12 @@ export function Win98Window({
       }
     >
       <header className="win98-titlebar draggable-window-titlebar" onPointerDown={startDragging}>
+        {interaction ? (
+          <TaskbarItemIcon
+            item={taskbarItemById[interaction.windowId]}
+            className="win98-titlebar-icon"
+          />
+        ) : null}
         <span className="min-w-0 flex-1 truncate">{title}</span>
         <span className="win98-controls">
           <span aria-hidden="true">_</span>

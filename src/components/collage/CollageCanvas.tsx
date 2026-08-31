@@ -51,12 +51,15 @@ const placement = (
   id: TaskbarWindowId,
   layout: MainWorldWindowLayout,
   zIndexes: Record<string, number>,
-  bringToFront: (id: TaskbarWindowId) => void
+  bringToFront: (id: TaskbarWindowId) => void,
+  activeWindowId: TaskbarWindowId
 ) => ({
   style: windowStyle(layout),
   zIndex: zIndexes[id] ?? layout.zIndex,
   interaction: {
     onActivate: () => bringToFront(id),
+    windowId: id,
+    isActive: activeWindowId === id,
   },
 });
 
@@ -98,19 +101,19 @@ export function CollageCanvas() {
       <main className="main-world-pile" aria-label="Hewen's editorial desktop collage">
         <BeforeCodeImageViewer
           id="before-code"
-          {...placement("beforeCode", mainWorldLayout.beforeCode, zIndexes, bringToFront)}
+          {...placement("beforeCode", mainWorldLayout.beforeCode, zIndexes, bringToFront, activeWindowId)}
         />
         <JourneyLogWindow
           id="journey"
-          {...placement("journey", mainWorldLayout.journey, zIndexes, bringToFront)}
+          {...placement("journey", mainWorldLayout.journey, zIndexes, bringToFront, activeWindowId)}
         />
         <ExperienceEditor
           id="experience"
-          {...placement("experience", mainWorldLayout.experience, zIndexes, bringToFront)}
+          {...placement("experience", mainWorldLayout.experience, zIndexes, bringToFront, activeWindowId)}
         />
         <ProjectsOpenDialog
           id="projects"
-          {...placement("projects", mainWorldLayout.projects, zIndexes, bringToFront)}
+          {...placement("projects", mainWorldLayout.projects, zIndexes, bringToFront, activeWindowId)}
           projects={projectOptions}
           selectedProject={selectedProject}
           onSelect={setSelectedProjectId}
@@ -119,17 +122,17 @@ export function CollageCanvas() {
         />
         <AboutNotepad
           id="about"
-          {...placement("about", mainWorldLayout.about, zIndexes, bringToFront)}
+          {...placement("about", mainWorldLayout.about, zIndexes, bringToFront, activeWindowId)}
         />
         <ContactSystemDialog
           id="contact"
-          {...placement("contact", mainWorldLayout.contact, zIndexes, bringToFront)}
+          {...placement("contact", mainWorldLayout.contact, zIndexes, bringToFront, activeWindowId)}
         />
 
         {openedProject ? (
           <ProjectPreviewWindow
             id="project-preview"
-            {...placement("projectPreview", mainWorldLayout.projectPreview, zIndexes, bringToFront)}
+            {...placement("projectPreview", mainWorldLayout.projectPreview, zIndexes, bringToFront, activeWindowId)}
             project={openedProject}
             onClose={closeProject}
           />

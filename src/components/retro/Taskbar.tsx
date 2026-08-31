@@ -1,13 +1,12 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useState } from "react";
+import { TaskbarItemIcon } from "@/components/retro/TaskbarItemIcon";
 import {
   projectPreviewTaskbarItem,
   resumeTaskbarItem,
   startTaskbarItem,
   taskbarWindowItems,
-  type TaskbarItem,
   type TaskbarWindowId,
 } from "@/components/retro/taskbarItems";
 
@@ -42,7 +41,7 @@ export function Taskbar({ activeWindowId, onWindowActivate, projectPreviewLabel 
       className="desktop-taskbar"
     >
       <button type="button" className="desktop-start-button focus-ring" aria-label="Start">
-        <TaskbarIcon item={startTaskbarItem} />
+        <TaskbarItemIcon item={startTaskbarItem} />
         {startTaskbarItem.label}
       </button>
 
@@ -55,7 +54,7 @@ export function Taskbar({ activeWindowId, onWindowActivate, projectPreviewLabel 
             onClick={() => onWindowActivate(windowItem.id)}
             className={`desktop-task-button focus-ring ${activeWindowId === windowItem.id ? "is-active" : ""}`}
           >
-            <TaskbarIcon item={windowItem} />
+            <TaskbarItemIcon item={windowItem} />
             <span>{windowItem.label}</span>
           </button>
         ))}
@@ -72,27 +71,5 @@ export function Taskbar({ activeWindowId, onWindowActivate, projectPreviewLabel 
         <time>{localTime}</time>
       </div>
     </nav>
-  );
-}
-
-function TaskbarIcon({
-  item,
-}: {
-  item: Pick<TaskbarItem, "fallbackIcon" | "icon" | "pixelArt">;
-}) {
-  if (!item.icon) {
-    return <span className="desktop-taskbar-fallback-icon" aria-hidden="true">{item.fallbackIcon}</span>;
-  }
-
-  return (
-    <Image
-      src={item.icon}
-      alt=""
-      width={20}
-      height={20}
-      unoptimized
-      className={`desktop-taskbar-icon ${item.pixelArt ? "is-pixel-art" : ""}`}
-      aria-hidden="true"
-    />
   );
 }
