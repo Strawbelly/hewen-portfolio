@@ -91,4 +91,13 @@ export const mainWorldLayout = {
     rotation: 0,
     zIndex: 50,
   },
+
+  collages: {
+    x: 26,
+    y: 12,
+    width: 48,
+    height: 520,
+    rotation: 0,
+    zIndex: 51,
+  },
 } satisfies Record<string, MainWorldWindowLayout>;

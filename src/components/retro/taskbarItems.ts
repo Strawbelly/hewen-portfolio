@@ -5,6 +5,7 @@ export type TaskbarWindowId =
   | "about"
   | "beforeCode"
   | "contact"
+  | "collages"
   | "projectPreview";
 
 export type DesktopWindowStatus = "open" | "minimized" | "closed";
@@ -63,6 +64,12 @@ export const taskbarItemById = {
     icon: "/assets/icons/taskbar/taskbar-contact.png",
     pixelArt: true,
   },
+  collages: {
+    id: "collages",
+    label: "Collages",
+    fallbackIcon: "▧",
+    icon: "/assets/icons/dekstop/desktop-paint.png",
+  },
   projectPreview: {
     id: "projectPreview",
     label: "Project Preview",
@@ -80,6 +87,7 @@ export const taskbarWindowItems = [
 ];
 
 export const projectPreviewTaskbarItem = taskbarItemById.projectPreview;
+export const collagesTaskbarItem = taskbarItemById.collages;
 
 export const resumeTaskbarItem = {
   label: "Resume",

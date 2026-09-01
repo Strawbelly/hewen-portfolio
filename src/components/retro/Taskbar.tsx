@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { TaskbarItemIcon } from "@/components/retro/TaskbarItemIcon";
 import {
+  collagesTaskbarItem,
   projectPreviewTaskbarItem,
   resumeTaskbarItem,
   startTaskbarItem,
@@ -16,13 +17,16 @@ type TaskbarProps = {
   activeWindowId: TaskbarWindowId | null;
   onWindowActivate: (id: TaskbarWindowId) => void;
   projectPreviewLabel?: string;
+  collagesVisible?: boolean;
 };
 
-export function Taskbar({ activeWindowId, onWindowActivate, projectPreviewLabel }: TaskbarProps) {
+export function Taskbar({ activeWindowId, onWindowActivate, projectPreviewLabel, collagesVisible = false }: TaskbarProps) {
   const [localTime, setLocalTime] = useState("--:--");
-  const taskbarWindows = projectPreviewLabel
-    ? [...taskbarWindowItems, { ...projectPreviewTaskbarItem, label: projectPreviewLabel }]
-    : taskbarWindowItems;
+  const taskbarWindows = [
+    ...taskbarWindowItems,
+    ...(collagesVisible ? [collagesTaskbarItem] : []),
+    ...(projectPreviewLabel ? [{ ...projectPreviewTaskbarItem, label: projectPreviewLabel }] : []),
+  ];
 
   useEffect(() => {
     const formatter = new Intl.DateTimeFormat(undefined, {

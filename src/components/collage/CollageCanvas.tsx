@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import type { CSSProperties } from "react";
 import { useCallback, useRef, useState } from "react";
 import { mainWorldLayout, type MainWorldWindowLayout } from "@/components/collage/mainWorldLayout";
@@ -8,6 +9,7 @@ import { DesktopDecoration } from "@/components/collage/DesktopDecoration";
 import { mainWorldDecorationsLayout } from "@/components/collage/mainWorldDecorationsLayout";
 import { BeforeCodeImageViewer } from "@/components/collage/windows/BeforeCodeImageViewer";
 import { ContactSystemDialog } from "@/components/collage/windows/ContactSystemDialog";
+import { CollagesFolderWindow } from "@/components/collage/windows/CollagesFolderWindow";
 import { ExperienceEditor } from "@/components/collage/windows/ExperienceEditor";
 import { JourneyLogWindow } from "@/components/collage/windows/JourneyLogWindow";
 import { ProjectPreviewWindow } from "@/components/collage/windows/ProjectPreviewWindow";
@@ -55,12 +57,13 @@ type DesktopWindowState = {
 
 type DesktopWindowStates = Record<TaskbarWindowId, DesktopWindowState>;
 
-const allWindowIds: TaskbarWindowId[] = [...desktopWindowIds, "projectPreview"];
+const allWindowIds: TaskbarWindowId[] = [...desktopWindowIds, "collages", "projectPreview"];
+const foregroundDecorationZIndex = 100;
 const initialWindowStates = Object.fromEntries(
   allWindowIds.map((id) => [
     id,
     {
-      status: id === "projectPreview" ? "closed" : "open",
+      status: id === "projectPreview" || id === "collages" ? "closed" : "open",
       zIndex: initialWindowZ[id],
     },
   ])
@@ -98,6 +101,7 @@ const placement = (
 export function CollageCanvas() {
   const decorationBoundsRef = useRef<HTMLDivElement>(null);
   const [selectedDecorationId, setSelectedDecorationId] = useState<string | null>(null);
+  const [desktopIconSelected, setDesktopIconSelected] = useState(false);
   const activeWindowRef = useRef<TaskbarWindowId>(initialActiveWindowId);
   const windowStatesRef = useRef<DesktopWindowStates>(initialWindowStates);
   const [windowStates, setWindowStates] = useState<DesktopWindowStates>(initialWindowStates);
@@ -129,7 +133,7 @@ export function CollageCanvas() {
     normalizedStates[id] = {
       ...normalizedStates[id],
       status: "open",
-      zIndex: allWindowIds.length + 1,
+      zIndex: id === "collages" ? foregroundDecorationZIndex + 1 : allWindowIds.length + 1,
     };
 
     commitWindowStates(normalizedStates);
@@ -189,9 +193,31 @@ export function CollageCanvas() {
         if (!(event.target as Element).closest(".main-world-decoration")) {
           setSelectedDecorationId(null);
         }
+        if (!(event.target as Element).closest(".main-world-desktop-icon")) {
+          setDesktopIconSelected(false);
+        }
       }}
     >
       <main className="main-world-pile" aria-label="Hewen's editorial desktop collage">
+        <button
+          type="button"
+          className={`main-world-desktop-icon ${desktopIconSelected ? "is-selected" : ""}`}
+          aria-label="Open Collages folder"
+          onClick={() => setDesktopIconSelected(true)}
+          onDoubleClick={() => focusWindow("collages")}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") focusWindow("collages");
+          }}
+        >
+          <Image
+            src="/assets/icons/dekstop/desktop-paint.png"
+            alt=""
+            width={1536}
+            height={1024}
+            priority
+          />
+          <span>Collages</span>
+        </button>
         <div ref={decorationBoundsRef} className="main-world-decorations">
           {mainWorldDecorationsLayout.map((decoration) => (
             <DesktopDecoration
@@ -234,6 +260,11 @@ export function CollageCanvas() {
           {...placement("contact", mainWorldLayout.contact, windowStates.contact, focusWindow, minimizeWindow, closeWindow, activeWindowId)}
         />
 
+        <CollagesFolderWindow
+          id="collages"
+          {...placement("collages", mainWorldLayout.collages, windowStates.collages, focusWindow, minimizeWindow, closeWindow, activeWindowId)}
+        />
+
         {openedProject ? (
           <ProjectPreviewWindow
             id="project-preview"
@@ -246,6 +277,7 @@ export function CollageCanvas() {
         activeWindowId={activeWindowId}
         onWindowActivate={handleTaskbarWindow}
         projectPreviewLabel={openedProject?.title}
+        collagesVisible={windowStates.collages.status !== "closed"}
       />
     </div>
   );
