@@ -2,8 +2,8 @@
 
 import { motion, useDragControls } from "framer-motion";
 import Image from "next/image";
-import type { PointerEvent, RefObject } from "react";
-import { useRef, useState } from "react";
+import type { PointerEvent as ReactPointerEvent, RefObject } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { MainWorldDecorationLayout } from "@/components/collage/mainWorldDecorationsLayout";
 
 type DesktopDecorationProps = {
@@ -32,29 +32,39 @@ export function DesktopDecoration({
   const [resizedWidth, setResizedWidth] = useState<number | null>(null);
   const [layer, setLayer] = useState<"back" | "front">("front");
 
-  const startResize = (event: PointerEvent<HTMLButtonElement>, direction: -1 | 1) => {
+  const startResize = (event: ReactPointerEvent<HTMLButtonElement>, direction: -1 | 1) => {
+    event.preventDefault();
     event.stopPropagation();
     onSelect(id);
     const currentWidth = decorationRef.current?.getBoundingClientRect().width;
     if (!currentWidth) return;
-    event.currentTarget.setPointerCapture(event.pointerId);
     resizeStart.current = { pointerX: event.clientX, width: currentWidth, direction };
   };
 
-  const resize = (event: PointerEvent<HTMLButtonElement>) => {
-    if (!resizeStart.current) return;
-    const nextWidth =
-      resizeStart.current.width +
-      (event.clientX - resizeStart.current.pointerX) * resizeStart.current.direction;
-    setResizedWidth(Math.max(64, Math.min(nextWidth, 360)));
-  };
+  useEffect(() => {
+    const resize = (event: PointerEvent) => {
+      if (!resizeStart.current) return;
+      event.preventDefault();
+      const nextWidth =
+        resizeStart.current.width +
+        (event.clientX - resizeStart.current.pointerX) * resizeStart.current.direction;
+      setResizedWidth(Math.max(64, Math.min(nextWidth, 360)));
+    };
 
-  const stopResize = (event: PointerEvent<HTMLButtonElement>) => {
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId);
-    }
-    resizeStart.current = null;
-  };
+    const stopResize = () => {
+      resizeStart.current = null;
+    };
+
+    window.addEventListener("pointermove", resize, { passive: false });
+    window.addEventListener("pointerup", stopResize);
+    window.addEventListener("pointercancel", stopResize);
+
+    return () => {
+      window.removeEventListener("pointermove", resize);
+      window.removeEventListener("pointerup", stopResize);
+      window.removeEventListener("pointercancel", stopResize);
+    };
+  }, []);
 
   return (
     <motion.div
@@ -105,9 +115,6 @@ export function DesktopDecoration({
               className={`main-world-decoration-scale-handle ${corner}`}
               aria-label="Resize decoration"
               onPointerDown={(event) => startResize(event, -1)}
-              onPointerMove={resize}
-              onPointerUp={stopResize}
-              onPointerCancel={stopResize}
             />
           ))}
           {(["top-right", "bottom-right"] as const).map((corner) => (
@@ -117,9 +124,6 @@ export function DesktopDecoration({
               className={`main-world-decoration-scale-handle ${corner}`}
               aria-label="Resize decoration"
               onPointerDown={(event) => startResize(event, 1)}
-              onPointerMove={resize}
-              onPointerUp={stopResize}
-              onPointerCancel={stopResize}
             />
           ))}
         </>

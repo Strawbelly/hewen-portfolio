@@ -185,7 +185,11 @@ export function CollageCanvas() {
     <div
       id="top"
       className="world-canvas main-world-desktop"
-      onPointerDownCapture={() => setSelectedDecorationId(null)}
+      onPointerDownCapture={(event) => {
+        if (!(event.target as Element).closest(".main-world-decoration")) {
+          setSelectedDecorationId(null);
+        }
+      }}
     >
       <main className="main-world-pile" aria-label="Hewen's editorial desktop collage">
         <div ref={decorationBoundsRef} className="main-world-decorations">
