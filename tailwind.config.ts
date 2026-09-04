@@ -16,9 +16,9 @@ const config: Config = {
         mint: "#9fe3c1"
       },
       fontFamily: {
-        display: ["var(--font-display)", "Georgia", "serif"],
+        display: ["var(--font-display)", "Trebuchet MS", "Tahoma", "Arial", "sans-serif"],
         mono: ["var(--font-mono)", "monospace"],
-        sans: ["var(--font-sans)", "Arial", "sans-serif"]
+        sans: ["var(--font-sans)", "Tahoma", "Arial", "sans-serif"]
       },
       boxShadow: {
         hard: "5px 5px 0 #151515",

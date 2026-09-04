@@ -3,7 +3,6 @@ export type TaskbarWindowId =
   | "experience"
   | "journey"
   | "about"
-  | "beforeCode"
   | "contact"
   | "collages"
   | "projectPreview";
@@ -50,13 +49,6 @@ export const taskbarItemById = {
     icon: "/assets/icons/taskbar/taskbar-about.png",
     pixelArt: true,
   },
-  beforeCode: {
-    id: "beforeCode",
-    label: "Before Code",
-    fallbackIcon: "▣",
-    icon: "/assets/icons/taskbar/taskbar-before-code.png",
-    pixelArt: true,
-  },
   contact: {
     id: "contact",
     label: "Contact",
@@ -82,7 +74,6 @@ export const taskbarWindowItems = [
   taskbarItemById.experience,
   taskbarItemById.journey,
   taskbarItemById.about,
-  taskbarItemById.beforeCode,
   taskbarItemById.contact,
 ];
 

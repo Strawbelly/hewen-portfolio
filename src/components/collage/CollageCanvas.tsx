@@ -7,12 +7,10 @@ import { mainWorldLayout, type MainWorldWindowLayout } from "@/components/collag
 import { AboutNotepad } from "@/components/collage/windows/AboutNotepad";
 import { DesktopDecoration } from "@/components/collage/DesktopDecoration";
 import { mainWorldDecorationsLayout } from "@/components/collage/mainWorldDecorationsLayout";
-import { BeforeCodeImageViewer } from "@/components/collage/windows/BeforeCodeImageViewer";
 import { ContactSystemDialog } from "@/components/collage/windows/ContactSystemDialog";
 import { CollagesFolderWindow } from "@/components/collage/windows/CollagesFolderWindow";
 import { ExperienceEditor } from "@/components/collage/windows/ExperienceEditor";
 import { JourneyLogWindow } from "@/components/collage/windows/JourneyLogWindow";
-import { ProjectPreviewWindow } from "@/components/collage/windows/ProjectPreviewWindow";
 import { ProjectsOpenDialog } from "@/components/collage/windows/ProjectsOpenDialog";
 import { projectOptions, type ProjectOption } from "@/components/collage/windows/projectOptions";
 import { Taskbar } from "@/components/retro/Taskbar";
@@ -43,7 +41,6 @@ const desktopWindowIds: TaskbarWindowId[] = [
   "experience",
   "journey",
   "about",
-  "beforeCode",
   "contact",
 ];
 const initialActiveWindowId = desktopWindowIds.reduce((front, id) =>
@@ -107,7 +104,6 @@ export function CollageCanvas() {
   const [windowStates, setWindowStates] = useState<DesktopWindowStates>(initialWindowStates);
   const [activeWindowId, setActiveWindowId] = useState<TaskbarWindowId | null>(initialActiveWindowId);
   const [selectedProjectId, setSelectedProjectId] = useState(projectOptions[0].id);
-  const [openedProject, setOpenedProject] = useState<ProjectOption | null>(null);
   const selectedProject =
     projectOptions.find((project) => project.id === selectedProjectId) ?? projectOptions[0];
 
@@ -175,14 +171,14 @@ export function CollageCanvas() {
     focusWindow(id);
   }, [focusWindow, minimizeWindow]);
 
-  const openProject = () => {
-    setOpenedProject(selectedProject);
-    focusWindow("projectPreview");
+  const openProject = (project: ProjectOption) => {
+    window.location.assign(project.href);
   };
 
-  const dismissProjectPreview = () => {
-    closeWindow("projectPreview");
-    setOpenedProject(null);
+  const viewProjectGithub = () => {
+    if (selectedProject.github) {
+      window.open(selectedProject.github, "_blank", "noopener,noreferrer");
+    }
   };
 
   return (
@@ -230,10 +226,6 @@ export function CollageCanvas() {
           ))}
         </div>
 
-        <BeforeCodeImageViewer
-          id="before-code"
-          {...placement("beforeCode", mainWorldLayout.beforeCode, windowStates.beforeCode, focusWindow, minimizeWindow, closeWindow, activeWindowId)}
-        />
         <JourneyLogWindow
           id="journey"
           {...placement("journey", mainWorldLayout.journey, windowStates.journey, focusWindow, minimizeWindow, closeWindow, activeWindowId)}
@@ -249,7 +241,7 @@ export function CollageCanvas() {
           selectedProject={selectedProject}
           onSelect={setSelectedProjectId}
           onOpen={openProject}
-          onCancel={dismissProjectPreview}
+          onViewGithub={viewProjectGithub}
         />
         <AboutNotepad
           id="about"
@@ -265,18 +257,10 @@ export function CollageCanvas() {
           {...placement("collages", mainWorldLayout.collages, windowStates.collages, focusWindow, minimizeWindow, closeWindow, activeWindowId)}
         />
 
-        {openedProject ? (
-          <ProjectPreviewWindow
-            id="project-preview"
-            {...placement("projectPreview", mainWorldLayout.projectPreview, windowStates.projectPreview, focusWindow, minimizeWindow, closeWindow, activeWindowId)}
-            project={openedProject}
-          />
-        ) : null}
       </main>
       <Taskbar
         activeWindowId={activeWindowId}
         onWindowActivate={handleTaskbarWindow}
-        projectPreviewLabel={openedProject?.title}
         collagesVisible={windowStates.collages.status !== "closed"}
       />
     </div>

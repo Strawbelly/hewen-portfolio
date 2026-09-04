@@ -2,14 +2,16 @@ import Image from "next/image";
 
 type RabbitAvatarProps = {
   variant?: "drawing" | "photo";
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "compact" | "md" | "story" | "lg";
   className?: string;
   priority?: boolean;
 };
 
 const sizeMap = {
   sm: 64,
+  compact: 90,
   md: 108,
+  story: 132,
   lg: 164
 };
 

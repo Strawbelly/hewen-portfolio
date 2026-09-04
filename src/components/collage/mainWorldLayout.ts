@@ -12,16 +12,6 @@ export type MainWorldWindowLayout = {
 };
 
 export const mainWorldLayout = {
-  // BACK — large image viewer
-  beforeCode: {
-    x: 22,
-    y: 65,
-    width: 32,
-    height: 630,
-    rotation: 0,
-    zIndex: 6,
-  },
-
   // BACK — journey peeking from upper-right
   journey: {
     x: 64,
@@ -54,8 +44,8 @@ export const mainWorldLayout = {
 
   // FRONT — small but still substantial
   about: {
-    x: 16,
-    y: 30,
+    x: 11,
+    y: 10,
     width: 20,
     height: 248,
     rotation: 0,
@@ -67,7 +57,7 @@ export const mainWorldLayout = {
     x: 10,
     y: 72,
     width: 18,
-    height: 180,
+    height: 210,
     rotation: 0,
     zIndex: 22,
   },
