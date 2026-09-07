@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { ProjectDetailLayout } from "@/components/projects/ProjectDetailLayout";
+import { ProjectDetail } from "@/features/projects/ProjectDetail";
 import { getProjectBySlug, projects } from "@/content/projects";
 
 type ProjectPageProps = {
@@ -22,7 +22,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
   return (
     <main className="project-document-page">
-      <ProjectDetailLayout project={project} />
+      <ProjectDetail project={project} />
     </main>
   );
 }
