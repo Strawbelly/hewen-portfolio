@@ -4,6 +4,7 @@ import Image from "next/image";
 import type { CSSProperties } from "react";
 import { useCallback, useRef, useState } from "react";
 import { PictureViewer } from "@/features/collages/PictureViewer";
+import type { CollageImage } from "@/features/collages/collageTypes";
 import { DesktopDecoration } from "@/features/desktop/DesktopDecoration";
 import { mainWorldDecorationsLayout } from "@/features/desktop/mainWorldDecorationsLayout";
 import { mainWorldLayout, type MainWorldWindowLayout } from "@/features/desktop/mainWorldLayout";
@@ -14,7 +15,7 @@ import { ContactSystemDialog } from "@/features/desktop/windows/ContactSystemDia
 import { ExperienceEditor } from "@/features/desktop/windows/ExperienceEditor";
 import { JourneyLogWindow } from "@/features/desktop/windows/JourneyLogWindow";
 import { ProjectsOpenDialog } from "@/features/desktop/windows/ProjectsOpenDialog";
-import { projectOptions, type ProjectOption } from "@/features/projects/projectData";
+import { projectOptions } from "@/features/projects/projectData";
 
 type WindowStyle = CSSProperties & {
   "--world-x": number;
@@ -95,7 +96,7 @@ const placement = (
   },
 });
 
-export function MainWorld() {
+export function MainWorld({ collageImages }: { collageImages: CollageImage[] }) {
   const decorationBoundsRef = useRef<HTMLDivElement>(null);
   const [selectedDecorationId, setSelectedDecorationId] = useState<string | null>(null);
   const [desktopIconSelected, setDesktopIconSelected] = useState(false);
@@ -171,10 +172,6 @@ export function MainWorld() {
     }
     focusWindow(id);
   }, [focusWindow, minimizeWindow]);
-
-  const openProject = (project: ProjectOption) => {
-    window.location.assign(project.href);
-  };
 
   const viewProjectGithub = () => {
     if (selectedProject.github) {
@@ -282,7 +279,6 @@ export function MainWorld() {
           projects={projectOptions}
           selectedProject={selectedProject}
           onSelect={setSelectedProjectId}
-          onOpen={openProject}
           onViewGithub={viewProjectGithub}
         />
         <AboutNotepad
@@ -296,6 +292,7 @@ export function MainWorld() {
 
         <PictureViewer
           id="collages"
+          collageImages={collageImages}
           {...placement("collages", mainWorldLayout.collages, windowStates.collages, focusWindow, minimizeWindow, closeWindow, activeWindowId)}
         />
 

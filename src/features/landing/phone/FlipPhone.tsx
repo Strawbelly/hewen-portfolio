@@ -242,7 +242,7 @@ export function FlipPhone({ onConnected, onSkip }: FlipPhoneProps) {
         onClick={onSkip}
         className="focus-ring landing-skip-link"
       >
-        <span>skip intro</span>
+        <span>ENTER MY WORLD</span>
         <span className="landing-skip-arrow" aria-hidden="true">
           →
         </span>

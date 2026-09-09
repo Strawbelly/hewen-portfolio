@@ -5,6 +5,7 @@ import type { PanInfo } from "framer-motion";
 import type { CSSProperties, PointerEvent, ReactNode } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { TaskbarItemIcon } from "@/features/desktop/TaskbarItemIcon";
+import { constrainWindowResize, windowMinimumSizes } from "./windowResize";
 import {
   taskbarItemById,
   type DesktopWindowStatus,
@@ -47,6 +48,10 @@ export function Win98Window({
   const windowRef = useRef<HTMLElement>(null);
   const dragControls = useDragControls();
   const [canDrag, setCanDrag] = useState(false);
+  const [resizedStyle, setResizedStyle] = useState<CSSProperties>();
+  const resizeSession = useRef<{
+    pointerId: number; x: number; y: number; width: number; height: number;
+  } | null>(null);
   const [dragConstraints, setDragConstraints] = useState({ left: 0, right: 0, top: 0, bottom: 0 });
 
   const updateDragConstraints = useCallback(() => {
@@ -67,6 +72,70 @@ export function Win98Window({
       bottom: desktop.clientHeight - titleBarHeight - baseTop,
     });
   }, []);
+
+  const resizeWindow = useCallback((width: number, height: number) => {
+    const element = windowRef.current;
+    const desktop = element?.parentElement;
+    if (!element || !desktop || element.hidden) return;
+    const rect = element.getBoundingClientRect();
+    const desktopRect = desktop.getBoundingClientRect();
+    const taskbar = desktop.closest(".main-world-desktop")?.querySelector(".desktop-taskbar");
+    const bounds = {
+      left: Math.max(0, desktopRect.left),
+      top: Math.max(0, desktopRect.top),
+      right: Math.min(window.innerWidth, desktopRect.right),
+      bottom: Math.min(window.innerHeight, desktopRect.bottom,
+        taskbar?.getBoundingClientRect().top ?? window.innerHeight),
+    };
+    const next = constrainWindowResize(
+      { left: rect.left, top: rect.top, width, height }, bounds,
+      windowMinimumSizes[interaction?.windowId ?? "journey"],
+    );
+    setResizedStyle({
+      width: next.width,
+      height: next.height,
+      // Preserve Framer Motion's current drag translation.
+      left: element.offsetLeft + next.left - rect.left,
+      top: element.offsetTop + next.top - rect.top,
+    });
+  }, [interaction?.windowId]);
+
+  useEffect(() => {
+    if (!canDrag || !resizedStyle || interaction?.status !== "open") return;
+    const fitDesktop = () => {
+      const element = windowRef.current;
+      if (element) resizeWindow(element.offsetWidth, element.offsetHeight);
+    };
+    window.addEventListener("resize", fitDesktop);
+    updateDragConstraints();
+    return () => window.removeEventListener("resize", fitDesktop);
+  }, [canDrag, resizedStyle, interaction?.status, resizeWindow, updateDragConstraints]);
+
+  const startResizing = (event: PointerEvent<HTMLButtonElement>) => {
+    if (!canDrag || event.button !== 0) return;
+    event.preventDefault();
+    event.stopPropagation();
+    interaction?.onActivate();
+    const element = windowRef.current;
+    if (!element) return;
+    resizeSession.current = {
+      pointerId: event.pointerId, x: event.clientX, y: event.clientY,
+      width: element.offsetWidth, height: element.offsetHeight,
+    };
+    event.currentTarget.setPointerCapture(event.pointerId);
+    resizeWindow(element.offsetWidth, element.offsetHeight);
+  };
+
+  const continueResizing = (event: PointerEvent<HTMLButtonElement>) => {
+    const session = resizeSession.current;
+    if (!canDrag || !session || session.pointerId !== event.pointerId) return;
+    resizeWindow(session.width + event.clientX - session.x, session.height + event.clientY - session.y);
+  };
+
+  const stopResizing = () => {
+    resizeSession.current = null;
+    updateDragConstraints();
+  };
 
   useEffect(() => {
     const desktopPointer = window.matchMedia("(min-width: 768px)");
@@ -98,7 +167,7 @@ export function Win98Window({
       id={id}
       hidden={interaction?.status !== "open"}
       className={`main-world-object win98-window draggable-desktop-window ${interaction?.isActive ? "is-active-window" : "is-inactive-window"} ${className}`}
-      style={{ ...style, zIndex }}
+      style={{ ...style, ...(canDrag ? resizedStyle : {}), zIndex }}
       drag={canDrag}
       dragListener={false}
       dragControls={dragControls}
@@ -142,6 +211,30 @@ export function Win98Window({
         </span>
       </header>
       {children}
+      {canDrag && (
+        <button
+          type="button"
+          className="win98-resize-handle"
+          aria-label={`Resize ${title}`}
+          onPointerDown={startResizing}
+          onPointerMove={continueResizing}
+          onPointerUp={stopResizing}
+          onPointerCancel={stopResizing}
+          onLostPointerCapture={stopResizing}
+          onKeyDown={(event) => {
+            if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(event.key)) return;
+            event.preventDefault();
+            interaction?.onActivate();
+            const element = windowRef.current;
+            if (!element) return;
+            const step = event.shiftKey ? 40 : 10;
+            resizeWindow(
+              element.offsetWidth + (event.key === "ArrowRight" ? step : event.key === "ArrowLeft" ? -step : 0),
+              element.offsetHeight + (event.key === "ArrowDown" ? step : event.key === "ArrowUp" ? -step : 0),
+            );
+          }}
+        />
+      )}
     </motion.article>
   );
 }

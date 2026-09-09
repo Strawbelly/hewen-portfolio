@@ -6,7 +6,6 @@ type ProjectsOpenDialogProps = PositionedWindowProps & {
   projects: ProjectOption[];
   selectedProject: ProjectOption;
   onSelect: (id: string) => void;
-  onOpen: (project: ProjectOption) => void;
   onViewGithub: () => void;
 };
 
@@ -14,7 +13,6 @@ export function ProjectsOpenDialog({
   projects,
   selectedProject,
   onSelect,
-  onOpen,
   onViewGithub,
   ...windowProps
 }: ProjectsOpenDialogProps) {
@@ -40,12 +38,16 @@ export function ProjectsOpenDialog({
                   aria-pressed={selected}
                   className={`project-shortcut focus-ring ${selected ? "is-selected" : ""}`}
                   onClick={() => onSelect(project.id)}
-                  onDoubleClick={() => {
-                    onSelect(project.id);
-                    onOpen(project);
-                  }}
                 >
-                  <span className="project-shortcut-icon" aria-hidden="true">{project.icon}</span>
+                  <span className="project-shortcut-icon" aria-hidden="true">
+                    {/* Project icons are local retro UI assets and retain their native pixel treatment. */}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={project.icon}
+                      alt=""
+                      style={{ transform: `scale(${project.iconScale ?? 1})` }}
+                    />
+                  </span>
                   <span>{project.title}</span>
                 </button>
               );
@@ -55,33 +57,22 @@ export function ProjectsOpenDialog({
           <section className="project-file-preview" aria-live="polite">
             <header>
               <span>PROJECT PREVIEW</span>
-              <strong>{selectedProject.title.toUpperCase()}</strong>
+              <strong>{selectedProject.previewTitle.toUpperCase()}</strong>
               <p>{selectedProject.description}</p>
             </header>
 
-            <div className={`project-system-visual is-${selectedProject.previewKind}`}>
-              <span className="project-system-caption">
-                {selectedProject.previewKind === "commerce" ? "ORDER FLOW / SYSTEM MAP" : null}
-                {selectedProject.previewKind === "education" ? "LEARNING SERVICE WORKFLOW" : null}
-                {selectedProject.previewKind === "music" ? "AGENT SESSION / AUDIO FLOW" : null}
-              </span>
-              <div className="project-system-nodes">
-                {selectedProject.previewLabels.map((label, index) => (
-                  <span key={label} data-node={index + 1}>{label}</span>
-                ))}
-              </div>
+            <div className="project-preview-tech-list">
+              {selectedProject.technologies.map((technology) => <span key={technology}>{technology}</span>)}
             </div>
 
-            <div className="project-preview-details">
-              <div className="project-preview-tech-list">
-                {selectedProject.technologies.map((technology) => <span key={technology}>{technology}</span>)}
-              </div>
-              <dl>
-                {selectedProject.metadata.map((detail) => {
-                  const [label, value] = detail.split(": ");
-                  return <div key={detail}><dt>{label}:</dt><dd>{value}</dd></div>;
-                })}
-              </dl>
+            <div className="project-preview-highlights">
+              <h2>ENGINEERING HIGHLIGHTS</h2>
+              {selectedProject.previewHighlights.map((highlight, index) => (
+                <section key={highlight.title}>
+                  <h3><span>{String(index + 1).padStart(2, "0")} —</span> {highlight.title.toUpperCase()}</h3>
+                  <p>{highlight.description}</p>
+                </section>
+              ))}
             </div>
           </section>
         </div>
@@ -91,18 +82,14 @@ export function ProjectsOpenDialog({
           <div className="win98-combo">
             <input id="selected-project" readOnly value={selectedProject.title} />
           </div>
-          <button type="button" onClick={() => onOpen(selectedProject)} className="win98-button">Open Project</button>
+          <span aria-hidden="true" />
           <span>Project type:</span>
           <div className="win98-combo"><span>{selectedProject.type}</span><span>▼</span></div>
-          <button
-            type="button"
-            onClick={onViewGithub}
-            disabled={!selectedProject.github}
-            className="win98-button"
-            title={selectedProject.github ? "Open GitHub in a new tab" : "GitHub URL not added yet"}
-          >
-            View GitHub
-          </button>
+          {selectedProject.github ? (
+            <button type="button" onClick={onViewGithub} className="win98-button">
+              View GitHub
+            </button>
+          ) : null}
         </div>
       </div>
     </Win98Window>

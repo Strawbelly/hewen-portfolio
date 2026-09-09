@@ -576,6 +576,56 @@ button:disabled {
   letter-spacing: 0;
 }
 
+.world-loading-screen {
+  display: grid;
+  width: 100vw;
+  height: 100vh;
+  place-items: center;
+  overflow: hidden;
+  background: #245edb;
+  color: #fff;
+  font-family: Tahoma, "Trebuchet MS", Arial, sans-serif;
+}
+
+.world-loading-content {
+  width: min(430px, calc(100vw - 48px));
+  text-align: center;
+}
+
+.world-loading-content > p {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.world-loading-progress {
+  display: grid;
+  height: 28px;
+  grid-template-columns: repeat(20, minmax(0, 1fr));
+  gap: 2px;
+  margin-top: 18px;
+  border: 2px solid;
+  border-color: #101010 #fff #fff #101010;
+  background: #fff;
+  padding: 3px;
+}
+
+.world-loading-progress > span {
+  min-width: 0;
+  background: #d4d0c8;
+}
+
+.world-loading-progress > span.is-complete {
+  background: #003399;
+}
+
+.world-loading-percent {
+  display: block;
+  margin-top: 7px;
+  font-family: "Lucida Console", "Courier New", monospace;
+  font-size: 12px;
+}
+
 .world-canvas {
   position: relative;
   isolation: isolate;
@@ -928,6 +978,43 @@ button:disabled {
     2px 2px 2px rgba(20, 35, 70, 0.14);
 }
 
+.win98-resize-handle {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  z-index: 2;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  cursor: nwse-resize;
+  touch-action: none;
+  user-select: none;
+}
+
+.win98-resize-handle::after {
+  content: "";
+  position: absolute;
+  right: 3px;
+  bottom: 3px;
+  width: 3px;
+  height: 3px;
+  background: #718096;
+  box-shadow: -4px 0 #718096, -8px 0 #718096, 0 -4px #718096,
+    -4px -4px #718096, 0 -8px #718096;
+}
+
+.win98-resize-handle:focus-visible {
+  outline: 1px dotted var(--xp-border-dark);
+  outline-offset: -1px;
+}
+
+@media (max-width: 767px) {
+  .win98-resize-handle { display: none; }
+}
+
 .win98-titlebar {
   display: flex;
   height: var(--retro-title-height);
@@ -1178,20 +1265,19 @@ button:disabled {
   overflow-y: auto;
   border-right: 1px solid #9aacc4;
   background: var(--xp-secondary-panel);
-  padding: 10px 7px;
+  padding: 10px 3px;
 }
 
 .project-shortcut {
-  display: grid;
-  grid-template-columns: 44px minmax(0, 1fr);
+  display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 3px;
   border: 1px solid transparent;
   background: transparent;
-  padding: 7px 5px;
+  padding: 7px 2px;
   color: #111;
   font-family: var(--font-system);
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.2;
   text-align: left;
 }
@@ -1210,36 +1296,47 @@ button:disabled {
 }
 
 .project-shortcut-icon {
-  display: grid;
-  width: 42px;
-  height: 38px;
-  place-items: center;
-  border: 1px solid #174ea6;
-  background: #f4f7fa;
-  color: #174ea6;
-  font-family: var(--font-system);
-  font-size: 25px;
-  line-height: 1;
-  box-shadow: 1px 1px 0 #fff inset, -1px -1px 0 #98a5b3 inset;
+  display: flex;
+  width: 64px;
+  height: 64px;
+  flex: 0 0 64px;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+}
+
+.project-shortcut-icon > img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 58px;
+  max-height: 58px;
+  object-fit: contain;
+  transform-origin: center;
+}
+
+.project-shortcut > span:last-child {
+  min-width: 0;
 }
 
 .project-file-preview {
   min-width: 0;
   min-height: 0;
   overflow-y: auto;
-  padding: 15px 17px 12px;
+  padding: 20px 24px 34px;
   font-family: var(--font-personal);
 }
 
 .project-file-preview > header {
   display: flex;
+  max-width: 78ch;
   flex-direction: column;
 }
 
 .project-file-preview > header > span {
   color: #66717d;
   font-family: var(--font-engineering);
-  font-size: 12px;
+  font-size: 14px;
   letter-spacing: 0.12em;
 }
 
@@ -1253,111 +1350,19 @@ button:disabled {
 
 .project-file-preview > header > p {
   margin-top: 4px;
-  font-size: 14px;
-  line-height: 1.4;
-}
-
-.project-system-visual {
-  height: 150px;
-  overflow: hidden;
-  border: 1px solid #657283;
-  background: #eef3f8;
-  margin-top: 10px;
-  padding: 8px 10px 10px;
-  box-shadow: 1px 1px 0 #c1c9d1 inset;
-}
-
-.project-system-caption {
-  display: block;
-  border-bottom: 1px solid #9aa7b4;
-  padding-bottom: 5px;
-  color: #435265;
-  font-size: 14px;
-  letter-spacing: 0.08em;
-}
-
-.project-system-nodes {
-  position: relative;
-  display: grid;
-  height: calc(100% - 22px);
-  align-items: center;
-  gap: 9px;
-  padding-top: 8px;
-}
-
-.project-system-nodes > span {
-  position: relative;
-  z-index: 1;
-  border: 1px solid #355b88;
-  background: #fff;
-  padding: 6px 4px;
-  color: #173f70;
-  font-size: 11px;
-  font-weight: 500;
-  text-align: center;
-  box-shadow: 1px 1px 0 #9eacb9;
-}
-
-.project-system-visual.is-commerce .project-system-nodes {
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-}
-
-.project-system-visual.is-commerce .project-system-nodes::before {
-  content: "";
-  position: absolute;
-  right: 5%;
-  left: 5%;
-  top: 51%;
-  border-top: 1px solid #355b88;
-}
-
-.project-system-visual.is-education {
-  background: #f7f3df;
-}
-
-.project-system-visual.is-education .project-system-nodes {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-template-rows: repeat(2, 1fr);
-}
-
-.project-system-visual.is-education .project-system-nodes > span:nth-child(4) {
-  grid-column: 1 / 2;
-}
-
-.project-system-visual.is-education .project-system-nodes > span:nth-child(5) {
-  grid-column: 3 / 4;
-}
-
-.project-system-visual.is-music {
-  background: #e9e4f2;
-}
-
-.project-system-visual.is-music .project-system-nodes {
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  align-items: end;
-}
-
-.project-system-visual.is-music .project-system-nodes > span:nth-child(odd) {
-  margin-bottom: 25px;
-}
-
-.project-system-visual.is-music .project-system-nodes > span {
-  border-color: #63527c;
-  color: #4c3a68;
-}
-
-.project-preview-details {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(155px, 0.9fr);
-  gap: 12px;
-  margin-top: 10px;
+  font-size: 17px;
+  line-height: 1.5;
 }
 
 .project-preview-tech-list {
   display: flex;
+  max-width: 78ch;
   flex-wrap: wrap;
   align-content: flex-start;
   gap: 4px;
+  margin-top: 20px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #aab6c5;
 }
 
 .project-preview-tech-list > span {
@@ -1365,26 +1370,45 @@ button:disabled {
   background: #f3f5f7;
   padding: 3px 5px;
   color: #243b5a;
-  font-size: 12px;
+  font-size: 14px;
 }
 
-.project-preview-details dl {
-  margin: 0;
-  font-size: 11px;
-  line-height: 1.45;
+.project-preview-highlights {
+  max-width: 78ch;
+  margin-top: 21px;
 }
 
-.project-preview-details dl > div {
-  display: flex;
-  gap: 4px;
+.project-preview-highlights > h2 {
+  color: #435265;
+  font-family: var(--font-engineering);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
 }
 
-.project-preview-details dt {
-  color: #596575;
+.project-preview-highlights > section {
+  margin-top: 20px;
 }
 
-.project-preview-details dd {
-  margin: 0;
+.project-preview-highlights h3 {
+  color: #1534a3;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.project-preview-highlights h3 span {
+  color: #66717d;
+  font-family: var(--font-engineering);
+  font-weight: 400;
+}
+
+.project-preview-highlights p {
+  max-width: 78ch;
+  margin-top: 4px;
+  color: #202733;
+  font-size: 17px;
+  line-height: 1.6;
 }
 
 .project-browser-fields {
@@ -1494,7 +1518,7 @@ button:disabled {
   background: #fff;
   padding: 25px 28px;
   font-family: Tahoma, "Trebuchet MS", Arial, sans-serif;
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 400;
   line-height: 1.5;
   box-shadow: 2px 2px 0 #888;
@@ -1507,7 +1531,7 @@ button:disabled {
 
 .editor-document > p:nth-child(2) {
   font-size: 17px;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .editor-document > p:nth-child(3) {
@@ -1542,7 +1566,7 @@ button:disabled {
 .experience-notes h2 {
   color: #1534a3;
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.02em;
 }
 
@@ -1636,7 +1660,7 @@ button:disabled {
 
 .journey-log-document h2 {
   margin-block: 0.75em;
-  color: #f0f0f0;
+  color: #ff87c7;
   font-size: 18px;
   font-weight: 700;
   line-height: inherit;
@@ -1749,7 +1773,7 @@ button:disabled {
   max-width: 470px;
   min-height: 46px;
   margin-top: 8px;
-  font-size: 16px;
+  font-size: 17px;
   line-height: 1.52;
 }
 
@@ -1773,7 +1797,7 @@ button:disabled {
 }
 
 .about-story-body > p {
-  font-size: 16px;
+  font-size: 17px;
   line-height: 1.56;
 }
 

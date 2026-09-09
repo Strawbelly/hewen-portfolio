@@ -5,7 +5,7 @@ import type { CSSProperties, SyntheticEvent } from "react";
 import { useCallback, useEffect, useState } from "react";
 import type { PositionedWindowProps } from "@/components/retro/Win98Window";
 import { Win98Window } from "@/components/retro/Win98Window";
-import { collageImages } from "@/features/collages/collageData";
+import type { CollageImage } from "@/features/collages/collageTypes";
 
 type ImageDimensions = {
   width: number;
@@ -22,8 +22,12 @@ const WINDOW_MARGIN = 16;
 const VIEWER_CHROME_HEIGHT = 176;
 const VIEWER_HORIZONTAL_INSET = 32;
 
-export function PictureViewer({ style, ...windowProps }: PositionedWindowProps) {
-  const [openImage, setOpenImage] = useState<(typeof collageImages)[number] | null>(null);
+type PictureViewerProps = PositionedWindowProps & {
+  collageImages: CollageImage[];
+};
+
+export function PictureViewer({ collageImages, style, ...windowProps }: PictureViewerProps) {
+  const [openImage, setOpenImage] = useState<CollageImage | null>(null);
   const [imageDimensions, setImageDimensions] = useState<ImageDimensions | null>(null);
   const [viewerWindowSize, setViewerWindowSize] = useState<ViewerWindowSize | null>(null);
 
@@ -59,7 +63,7 @@ export function PictureViewer({ style, ...windowProps }: PositionedWindowProps) 
     return () => window.removeEventListener("resize", updateViewerSize);
   }, [calculateViewerWindowSize, imageDimensions, openImage]);
 
-  const openCollage = useCallback((image: (typeof collageImages)[number]) => {
+  const openCollage = useCallback((image: CollageImage) => {
     const previewImage = new window.Image();
     previewImage.onload = () => {
       const dimensions = {
@@ -81,7 +85,7 @@ export function PictureViewer({ style, ...windowProps }: PositionedWindowProps) 
     if (openImageIndex < 0) return;
     const nextImage = collageImages[openImageIndex + direction];
     if (nextImage) openCollage(nextImage);
-  }, [openCollage, openImageIndex]);
+  }, [collageImages, openCollage, openImageIndex]);
 
   useEffect(() => {
     if (!openImage || windowProps.interaction?.status !== "open" || !windowProps.interaction.isActive) return;
@@ -97,7 +101,7 @@ export function PictureViewer({ style, ...windowProps }: PositionedWindowProps) 
     };
     window.addEventListener("keydown", handleKeyboardNavigation);
     return () => window.removeEventListener("keydown", handleKeyboardNavigation);
-  }, [openImage, openImageIndex, showAdjacentImage, windowProps.interaction?.isActive, windowProps.interaction?.status]);
+  }, [collageImages.length, openImage, openImageIndex, showAdjacentImage, windowProps.interaction?.isActive, windowProps.interaction?.status]);
 
   const returnToFolder = () => {
     setOpenImage(null);
