@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import type { CSSProperties } from "react";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { PictureViewer } from "@/features/collages/PictureViewer";
 import type { CollageImage } from "@/features/collages/collageTypes";
 import { DesktopDecoration } from "@/features/desktop/DesktopDecoration";
@@ -97,6 +97,17 @@ const placement = (
 });
 
 export function MainWorld({ collageImages }: { collageImages: CollageImage[] }) {
+  const [isMobile, setIsMobile] = useState(false);
+  const [mobileWindowId, setMobileWindowId] = useState<TaskbarWindowId | null>(null);
+
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 768px)");
+    const updateMode = () => setIsMobile(media.matches);
+    updateMode();
+    media.addEventListener("change", updateMode);
+    return () => media.removeEventListener("change", updateMode);
+  }, []);
+
   const decorationBoundsRef = useRef<HTMLDivElement>(null);
   const [selectedDecorationId, setSelectedDecorationId] = useState<string | null>(null);
   const [desktopIconSelected, setDesktopIconSelected] = useState(false);
@@ -115,6 +126,10 @@ export function MainWorld({ collageImages }: { collageImages: CollageImage[] }) 
   }, []);
 
   const focusWindow = useCallback((id: TaskbarWindowId) => {
+    if (isMobile) {
+      setMobileWindowId(id);
+      return;
+    }
     const current = windowStatesRef.current;
     if (activeWindowRef.current === id && current[id].status === "open") return;
 
@@ -137,9 +152,13 @@ export function MainWorld({ collageImages }: { collageImages: CollageImage[] }) 
     commitWindowStates(normalizedStates);
     activeWindowRef.current = id;
     setActiveWindowId(id);
-  }, [commitWindowStates]);
+  }, [commitWindowStates, isMobile]);
 
   const changeWindowStatus = useCallback((id: TaskbarWindowId, status: DesktopWindowStatus) => {
+    if (isMobile) {
+      setMobileWindowId(null);
+      return;
+    }
     const current = windowStatesRef.current;
     const nextStates: DesktopWindowStates = {
       ...current,
@@ -152,7 +171,7 @@ export function MainWorld({ collageImages }: { collageImages: CollageImage[] }) 
       activeWindowRef.current = nextActiveWindow ?? initialActiveWindowId;
       setActiveWindowId(nextActiveWindow);
     }
-  }, [commitWindowStates]);
+  }, [commitWindowStates, isMobile]);
 
   const minimizeWindow = useCallback(
     (id: TaskbarWindowId) => changeWindowStatus(id, "minimized"),
@@ -165,13 +184,25 @@ export function MainWorld({ collageImages }: { collageImages: CollageImage[] }) 
   );
 
   const handleTaskbarWindow = useCallback((id: TaskbarWindowId) => {
+    if (isMobile) {
+      setMobileWindowId((current) => current === id ? null : id);
+      return;
+    }
     const state = windowStatesRef.current[id];
     if (state.status === "open" && activeWindowRef.current === id) {
       minimizeWindow(id);
       return;
     }
     focusWindow(id);
-  }, [focusWindow, minimizeWindow]);
+  }, [focusWindow, minimizeWindow, isMobile]);
+
+  // Mobile visibility is independent of the desktop's open windows and stacking order.
+  const visibleActiveWindowId = isMobile ? mobileWindowId : activeWindowId;
+  const visibleWindowStates = isMobile
+    ? Object.fromEntries(allWindowIds.map((id) => [id, {
+        ...windowStates[id], status: id === mobileWindowId ? "open" : "closed",
+      }])) as DesktopWindowStates
+    : windowStates;
 
   const viewProjectGithub = () => {
     if (selectedProject.github) {
@@ -183,6 +214,7 @@ export function MainWorld({ collageImages }: { collageImages: CollageImage[] }) 
     <div
       id="top"
       className="world-canvas main-world-desktop"
+      data-mobile-window={mobileWindowId ?? "desktop"}
       onPointerDownCapture={(event) => {
         if (!(event.target as Element).closest(".main-world-decoration")) {
           setSelectedDecorationId(null);
@@ -199,6 +231,7 @@ export function MainWorld({ collageImages }: { collageImages: CollageImage[] }) 
           className={`main-world-desktop-icon ${desktopIconSelected ? "is-selected" : ""}`}
           aria-label="Open Collages folder"
           onClick={() => {
+            if (isMobile) focusWindow("collages");
             setDesktopIconSelected(true);
             setResumeIconSelected(false);
           }}
@@ -223,7 +256,7 @@ export function MainWorld({ collageImages }: { collageImages: CollageImage[] }) 
           rel="noopener noreferrer"
           aria-label="Preview Hewen Shen resume in a new tab"
           onClick={(event) => {
-            event.preventDefault();
+            if (!isMobile) event.preventDefault();
             setResumeIconSelected(true);
             setDesktopIconSelected(false);
           }}
@@ -267,15 +300,15 @@ export function MainWorld({ collageImages }: { collageImages: CollageImage[] }) 
 
         <JourneyLogWindow
           id="journey"
-          {...placement("journey", mainWorldLayout.journey, windowStates.journey, focusWindow, minimizeWindow, closeWindow, activeWindowId)}
+          {...placement("journey", mainWorldLayout.journey, visibleWindowStates.journey, focusWindow, minimizeWindow, closeWindow, visibleActiveWindowId)}
         />
         <ExperienceEditor
           id="experience"
-          {...placement("experience", mainWorldLayout.experience, windowStates.experience, focusWindow, minimizeWindow, closeWindow, activeWindowId)}
+          {...placement("experience", mainWorldLayout.experience, visibleWindowStates.experience, focusWindow, minimizeWindow, closeWindow, visibleActiveWindowId)}
         />
         <ProjectsOpenDialog
           id="projects"
-          {...placement("projects", mainWorldLayout.projects, windowStates.projects, focusWindow, minimizeWindow, closeWindow, activeWindowId)}
+          {...placement("projects", mainWorldLayout.projects, visibleWindowStates.projects, focusWindow, minimizeWindow, closeWindow, visibleActiveWindowId)}
           projects={projectOptions}
           selectedProject={selectedProject}
           onSelect={setSelectedProjectId}
@@ -283,24 +316,24 @@ export function MainWorld({ collageImages }: { collageImages: CollageImage[] }) 
         />
         <AboutNotepad
           id="about"
-          {...placement("about", mainWorldLayout.about, windowStates.about, focusWindow, minimizeWindow, closeWindow, activeWindowId)}
+          {...placement("about", mainWorldLayout.about, visibleWindowStates.about, focusWindow, minimizeWindow, closeWindow, visibleActiveWindowId)}
         />
         <ContactSystemDialog
           id="contact"
-          {...placement("contact", mainWorldLayout.contact, windowStates.contact, focusWindow, minimizeWindow, closeWindow, activeWindowId)}
+          {...placement("contact", mainWorldLayout.contact, visibleWindowStates.contact, focusWindow, minimizeWindow, closeWindow, visibleActiveWindowId)}
         />
 
         <PictureViewer
           id="collages"
           collageImages={collageImages}
-          {...placement("collages", mainWorldLayout.collages, windowStates.collages, focusWindow, minimizeWindow, closeWindow, activeWindowId)}
+          {...placement("collages", mainWorldLayout.collages, visibleWindowStates.collages, focusWindow, minimizeWindow, closeWindow, visibleActiveWindowId)}
         />
 
       </main>
       <Taskbar
-        activeWindowId={activeWindowId}
+        activeWindowId={visibleActiveWindowId}
         onWindowActivate={handleTaskbarWindow}
-        collagesVisible={windowStates.collages.status !== "closed"}
+        collagesVisible={visibleWindowStates.collages.status !== "closed"}
       />
     </div>
   );

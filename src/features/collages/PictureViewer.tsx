@@ -209,6 +209,9 @@ export function PictureViewer({ collageImages, style, ...windowProps }: PictureV
                 key={image.src}
                 type="button"
                 className="collages-file"
+                onClick={() => {
+                  if (window.matchMedia("(max-width: 768px)").matches) openCollage(image);
+                }}
                 onDoubleClick={() => openCollage(image)}
                 onKeyDown={(event) => {
                   if (event.key === "Enter") openCollage(image);

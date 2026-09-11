@@ -3564,3 +3564,209 @@ button:disabled {
     clip-path: inset(51% 0 0 0);
   }
 }
+
+/* Mobile desktop: full-size app content in one viewport-bound window. */
+@media (max-width: 768px) {
+  .main-world-desktop {
+    --main-world-taskbar-height: calc(52px + env(safe-area-inset-bottom, 0px));
+    --retro-title-height: 44px;
+    height: 100dvh;
+    min-height: 100dvh;
+    overflow: hidden;
+  }
+
+  .main-world-desktop .main-world-pile {
+    display: block;
+    height: calc(100dvh - var(--main-world-taskbar-height));
+    min-height: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .main-world-desktop .main-world-object {
+    position: absolute;
+    left: 8px !important;
+    top: max(8px, env(safe-area-inset-top, 0px)) !important;
+    width: calc(100% - 16px) !important;
+    height: calc(100% - max(8px, env(safe-area-inset-top, 0px)) - 8px) !important;
+    max-width: none;
+    min-width: 0;
+    margin: 0;
+    transform: none !important;
+  }
+
+  /* Also suppress desktop windows before the mobile media query hydrates. */
+  .main-world-desktop[data-mobile-window="desktop"] .win98-window,
+  .main-world-desktop .win98-window[hidden],
+  .main-world-desktop .main-world-decorations,
+  .main-world-desktop .win98-resize-handle,
+  .main-world-desktop:not([data-mobile-window="desktop"]) .main-world-desktop-icon {
+    display: none;
+  }
+
+  .main-world-desktop .main-world-desktop-icon {
+    top: 20px;
+    left: 12px;
+  }
+
+  .main-world-desktop .main-world-resume-icon {
+    top: 20px;
+    left: 148px;
+    overflow-wrap: anywhere;
+  }
+
+  .main-world-desktop .draggable-window-titlebar {
+    cursor: default;
+    touch-action: auto;
+  }
+
+  .main-world-desktop .win98-controls {
+    flex-shrink: 0;
+    gap: 4px;
+  }
+
+  .main-world-desktop .win98-controls > button {
+    width: 32px;
+    height: 32px;
+    font-size: 20px;
+  }
+
+  .main-world-desktop .desktop-taskbar {
+    padding-bottom: calc(2px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .main-world-desktop .desktop-start-button {
+    min-width: 72px;
+    margin-block: 0;
+  }
+
+  .main-world-desktop .desktop-task-buttons {
+    gap: 3px;
+    overscroll-behavior-x: contain;
+  }
+
+  .main-world-desktop .desktop-task-button {
+    flex: 0 0 auto;
+    min-width: 120px;
+    max-width: none;
+    height: 44px;
+  }
+
+  .main-world-desktop .desktop-system-tray {
+    display: none;
+  }
+
+  .main-world-desktop .project-browser-dialog {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .main-world-desktop .project-browser-dialog > * {
+    flex-shrink: 0;
+  }
+
+  .main-world-desktop .project-browser-workspace {
+    display: flex;
+    flex: 0 0 auto;
+    flex-direction: column;
+  }
+
+  .main-world-desktop .project-shortcuts {
+    flex-direction: row;
+    overflow-x: auto;
+    border-right: 0;
+    border-bottom: 1px solid #9aacc4;
+    padding: 6px;
+  }
+
+  .main-world-desktop .project-shortcut {
+    flex: 0 0 140px;
+  }
+
+  .main-world-desktop .project-file-preview {
+    overflow: visible;
+    padding: 16px;
+    overflow-wrap: anywhere;
+  }
+
+  .main-world-desktop .project-browser-fields {
+    grid-template-columns: 94px minmax(0, 1fr);
+  }
+
+  .main-world-desktop .project-browser-fields > span[aria-hidden] {
+    display: none;
+  }
+
+  .main-world-desktop .project-browser-fields .win98-button {
+    grid-column: 2;
+    min-height: 40px;
+  }
+
+  .main-world-desktop .open-file-location-row .win98-field {
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .main-world-desktop .editor-document {
+    width: calc(100% - 12px);
+    padding: 16px;
+  }
+
+  .main-world-desktop .about-notepad-document {
+    padding: 14px;
+  }
+
+  .main-world-desktop .about-notepad-opening {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .main-world-desktop .about-notepad-opening .rabbit-frame {
+    display: none;
+  }
+
+  .main-world-desktop .collages-folder-content {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 8px;
+    gap: 8px;
+  }
+
+  .main-world-desktop .collages-folder-toolbar {
+    gap: 4px;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .main-world-desktop .editor-document,
+  .main-world-desktop .journey-log-text,
+  .main-world-desktop .about-notepad-document,
+  .main-world-desktop .contact-messenger-chat,
+  .main-world-desktop .collages-folder-content {
+    overscroll-behavior: contain;
+    overflow-wrap: anywhere;
+  }
+}
+
+/* Override geometry only; retain the normal frame and stored drag translation. */
+.main-world-desktop .win98-window[data-maximized="true"] {
+  left: 0 !important;
+  top: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none;
+  transform: none !important;
+}
+
+.main-world-desktop .win98-window[data-maximized="true"] .draggable-window-titlebar {
+  cursor: default;
+  touch-action: auto;
+}
+
+@media (max-width: 768px) {
+  .main-world-desktop .win98-window[data-maximized="true"] {
+    left: 3px !important;
+    top: max(3px, env(safe-area-inset-top, 0px)) !important;
+    width: calc(100% - 6px) !important;
+    height: calc(100% - max(3px, env(safe-area-inset-top, 0px)) - 3px) !important;
+  }
+}

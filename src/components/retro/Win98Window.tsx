@@ -48,6 +48,8 @@ export function Win98Window({
   const windowRef = useRef<HTMLElement>(null);
   const dragControls = useDragControls();
   const [canDrag, setCanDrag] = useState(false);
+  const [isMaximized, setIsMaximized] = useState(false);
+  const interactionsEnabled = canDrag && !isMaximized;
   const [resizedStyle, setResizedStyle] = useState<CSSProperties>();
   const resizeSession = useRef<{
     pointerId: number; x: number; y: number; width: number; height: number;
@@ -76,7 +78,8 @@ export function Win98Window({
   const resizeWindow = useCallback((width: number, height: number) => {
     const element = windowRef.current;
     const desktop = element?.parentElement;
-    if (!element || !desktop || element.hidden) return;
+    if (!element || !desktop || element.hidden || isMaximized ||
+        !window.matchMedia("(min-width: 769px)").matches) return;
     const rect = element.getBoundingClientRect();
     const desktopRect = desktop.getBoundingClientRect();
     const taskbar = desktop.closest(".main-world-desktop")?.querySelector(".desktop-taskbar");
@@ -98,10 +101,10 @@ export function Win98Window({
       left: element.offsetLeft + next.left - rect.left,
       top: element.offsetTop + next.top - rect.top,
     });
-  }, [interaction?.windowId]);
+  }, [interaction?.windowId, isMaximized]);
 
   useEffect(() => {
-    if (!canDrag || !resizedStyle || interaction?.status !== "open") return;
+    if (!interactionsEnabled || !resizedStyle || interaction?.status !== "open") return;
     const fitDesktop = () => {
       const element = windowRef.current;
       if (element) resizeWindow(element.offsetWidth, element.offsetHeight);
@@ -109,10 +112,10 @@ export function Win98Window({
     window.addEventListener("resize", fitDesktop);
     updateDragConstraints();
     return () => window.removeEventListener("resize", fitDesktop);
-  }, [canDrag, resizedStyle, interaction?.status, resizeWindow, updateDragConstraints]);
+  }, [interactionsEnabled, resizedStyle, interaction?.status, resizeWindow, updateDragConstraints]);
 
   const startResizing = (event: PointerEvent<HTMLButtonElement>) => {
-    if (!canDrag || event.button !== 0) return;
+    if (!interactionsEnabled || event.button !== 0) return;
     event.preventDefault();
     event.stopPropagation();
     interaction?.onActivate();
@@ -128,7 +131,7 @@ export function Win98Window({
 
   const continueResizing = (event: PointerEvent<HTMLButtonElement>) => {
     const session = resizeSession.current;
-    if (!canDrag || !session || session.pointerId !== event.pointerId) return;
+    if (!interactionsEnabled || !session || session.pointerId !== event.pointerId) return;
     resizeWindow(session.width + event.clientX - session.x, session.height + event.clientY - session.y);
   };
 
@@ -138,7 +141,7 @@ export function Win98Window({
   };
 
   useEffect(() => {
-    const desktopPointer = window.matchMedia("(min-width: 768px)");
+    const desktopPointer = window.matchMedia("(min-width: 769px)");
     const updateDraggingMode = () => setCanDrag(desktopPointer.matches);
     updateDraggingMode();
     updateDragConstraints();
@@ -151,10 +154,27 @@ export function Win98Window({
   }, [updateDragConstraints]);
 
   const startDragging = (event: PointerEvent<HTMLElement>) => {
-    if (!canDrag || event.target instanceof Element && event.target.closest("button")) return;
+    if (!interactionsEnabled || event.target instanceof Element && event.target.closest("button")) return;
     interaction?.onActivate();
     updateDragConstraints();
     dragControls.start(event);
+  };
+
+  const toggleMaximize = () => {
+    interaction?.onActivate();
+    if (!isMaximized && canDrag && windowRef.current) {
+      // Freeze the untransformed geometry, including subpixel positions. The
+      // motion translation remains untouched and is revealed again on restore.
+      const computed = window.getComputedStyle(windowRef.current);
+      setResizedStyle({
+        left: computed.left,
+        top: computed.top,
+        width: computed.width,
+        height: computed.height,
+      });
+    }
+    resizeSession.current = null;
+    setIsMaximized((maximized) => !maximized);
   };
 
   const keepWindowActive = (_event: MouseEvent | TouchEvent | PointerEvent, _info: PanInfo) => {
@@ -166,9 +186,10 @@ export function Win98Window({
       ref={windowRef}
       id={id}
       hidden={interaction?.status !== "open"}
+      data-maximized={isMaximized}
       className={`main-world-object win98-window draggable-desktop-window ${interaction?.isActive ? "is-active-window" : "is-inactive-window"} ${className}`}
       style={{ ...style, ...(canDrag ? resizedStyle : {}), zIndex }}
-      drag={canDrag}
+      drag={interactionsEnabled}
       dragListener={false}
       dragControls={dragControls}
       dragConstraints={dragConstraints}
@@ -198,7 +219,16 @@ export function Win98Window({
               interaction?.onMinimize();
             }}
           >_</button>
-          <span aria-hidden="true">□</span>
+          <button
+            type="button"
+            aria-label={`${isMaximized ? "Restore" : "Maximize"} ${title}`}
+            aria-pressed={isMaximized}
+            onPointerDown={(event) => event.stopPropagation()}
+            onClick={(event) => {
+              event.stopPropagation();
+              toggleMaximize();
+            }}
+          >{isMaximized ? "❐" : "□"}</button>
           <button
             type="button"
             aria-label={`Close ${title}`}
@@ -211,7 +241,7 @@ export function Win98Window({
         </span>
       </header>
       {children}
-      {canDrag && (
+      {interactionsEnabled && (
         <button
           type="button"
           className="win98-resize-handle"
