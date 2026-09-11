@@ -46,7 +46,7 @@ const getViewportLayout = () => {
     return { isDesktop: true, supportsHover: false, scale: 1 };
   }
 
-  const isDesktop = window.innerWidth >= DESKTOP_BREAKPOINT;
+  const isDesktop = window.innerWidth > DESKTOP_BREAKPOINT;
   return {
     isDesktop,
     supportsHover: window.matchMedia("(hover: hover) and (pointer: fine)")
