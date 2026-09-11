@@ -6,7 +6,7 @@ import { useCallback, useRef, useState } from "react";
 import { PictureViewer } from "@/features/collages/PictureViewer";
 import type { CollageImage } from "@/features/collages/collageTypes";
 import { DesktopDecoration } from "@/features/desktop/DesktopDecoration";
-import { mainWorldDecorationsLayout } from "@/features/desktop/mainWorldDecorationsLayout";
+import { mainWorldDecorationConfig } from "@/features/desktop/mainWorldDecorationsLayout";
 import { mainWorldLayout, type MainWorldWindowLayout } from "@/features/desktop/mainWorldLayout";
 import { Taskbar } from "@/features/desktop/Taskbar";
 import type { DesktopWindowStatus, TaskbarWindowId } from "@/features/desktop/taskbarItems";
@@ -254,12 +254,12 @@ export function MainWorld({ collageImages }: { collageImages: CollageImage[] }) 
           <span>Hewen_Shen_Resume.pdf</span>
         </a>
         <div ref={decorationBoundsRef} className="main-world-decorations">
-          {mainWorldDecorationsLayout.map((decoration) => (
+          {mainWorldDecorationConfig.map((decoration) => (
             <DesktopDecoration
-              key={decoration.id}
+              key={decoration.filename}
               layout={decoration}
               constraintsRef={decorationBoundsRef}
-              isSelected={selectedDecorationId === decoration.id}
+              isSelected={selectedDecorationId === `decoration-${decoration.filename}`}
               onSelect={setSelectedDecorationId}
             />
           ))}

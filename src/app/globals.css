@@ -3376,7 +3376,15 @@ button:disabled {
   }
 
   .main-world-decorations {
+    display: block;
+  }
+
+  .main-world-decoration {
     display: none;
+  }
+
+  .main-world-decoration.is-mobile-visible {
+    display: block;
   }
 
   .main-world-desktop {

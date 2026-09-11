@@ -4,6 +4,7 @@ type PhoneKeypadProps = {
   onDigit: (digit: KeypadDigit) => void;
   onBack: () => void;
   onOk: () => void;
+  onSend: () => void;
   canConnect: boolean;
   disabled?: boolean;
 };
@@ -23,11 +24,11 @@ const keys: Array<{ value: string; digit?: KeypadDigit }> = [
   { value: "#" }
 ];
 
-export function PhoneKeypad({ onDigit, onBack, onOk, canConnect, disabled = false }: PhoneKeypadProps) {
+export function PhoneKeypad({ onDigit, onBack, onOk, onSend, canConnect, disabled = false }: PhoneKeypadProps) {
   return (
     <div className="phone-controls" aria-label="Multi-tap phone keypad">
       <div className="phone-nav-pad">
-        <button type="button" className="phone-soft phone-soft-send" disabled={disabled}>
+        <button type="button" onClick={onSend} className="phone-soft phone-soft-send" disabled={disabled}>
           Send
         </button>
         <button

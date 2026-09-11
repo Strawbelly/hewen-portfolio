@@ -1,8 +1,7 @@
 export type MainWorldDecorationLayout = {
-  id: string;
-  src: string;
-  imageWidth: number;
-  imageHeight: number;
+  filename: string;
+  /** Intrinsic image ratio used to preserve the decoration's natural shape. */
+  aspectRatio: string;
   /** Initial horizontal position as a percentage of the full desktop stage. */
   x: number;
   /** Initial vertical position as a percentage of the usable desktop stage. */
@@ -11,11 +10,16 @@ export type MainWorldDecorationLayout = {
   width: number;
   /** Initial clockwise rotation in degrees. */
   rotation: number;
+  /** Initial stacking level; double-clicking still toggles front/back as before. */
+  zIndex: number;
+  /** Decorations remain hidden in the mobile layout unless explicitly enabled. */
+  mobileVisible?: boolean;
 };
 
-export const mainWorldDecorationsLayout: MainWorldDecorationLayout[] = [
-  { id: "decoration-01", src: "/assets/main-world/decoration_01.png", imageWidth: 897, imageHeight: 786, x: 78, y: 13, width: 160, rotation: 18 },
-  { id: "decoration-02", src: "/assets/main-world/decoration_02.png", imageWidth: 2532, imageHeight: 2031, x: 83, y: 76, width: 130, rotation: 0 },
-  { id: "decoration-03", src: "/assets/main-world/decoration_03.png", imageWidth: 447, imageHeight: 465, x: 14, y: 62, width: 120, rotation: 0 },
-  { id: "decoration-04", src: "/assets/main-world/decoration_04.png", imageWidth: 371, imageHeight: 475, x: 27, y: 52, width: 66, rotation: 0 },
+export const mainWorldDecorationConfig: MainWorldDecorationLayout[] = [
+  { filename: "decoration_01.png", aspectRatio: "897 / 786", x: 78, y: 13, width: 160, rotation: 18, zIndex: 100 },
+  { filename: "decoration_02.png", aspectRatio: "2532 / 2031", x: 83, y: 76, width: 130, rotation: 0, zIndex: 100 },
+  { filename: "decoration_03.png", aspectRatio: "447 / 465", x: 14, y: 62, width: 120, rotation: 0, zIndex: 100 },
+  { filename: "decoration_04.png", aspectRatio: "371 / 475", x: 27, y: 52, width: 66, rotation: 0, zIndex: 100 },
+  { filename: "decoration_05.png", aspectRatio: "350 / 1365", x: 66, y: 42, width: 70, rotation: 0, zIndex: 100 },
 ];

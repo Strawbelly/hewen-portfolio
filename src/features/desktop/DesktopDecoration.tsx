@@ -25,7 +25,9 @@ export function DesktopDecoration({
   isSelected,
   onSelect,
 }: DesktopDecorationProps) {
-  const { id, src, imageWidth, imageHeight, x, y, width, rotation } = layout;
+  const { filename, aspectRatio, x, y, width, rotation, zIndex, mobileVisible } = layout;
+  const id = `decoration-${filename}`;
+  const src = `/assets/main-world/decorations/${filename}`;
   const decorationRef = useRef<HTMLDivElement>(null);
   const resizeStart = useRef<ResizeStart | null>(null);
   const dragControls = useDragControls();
@@ -69,14 +71,14 @@ export function DesktopDecoration({
   return (
     <motion.div
       ref={decorationRef}
-      className={`main-world-decoration ${isSelected ? "is-selected" : ""}`}
+      className={`main-world-decoration ${isSelected ? "is-selected" : ""} ${mobileVisible ? "is-mobile-visible" : ""}`}
       style={{
         left: `${x}%`,
         top: `${y}%`,
-        aspectRatio: `${imageWidth} / ${imageHeight}`,
+        aspectRatio,
         width: resizedWidth ?? width,
         rotate: rotation,
-        zIndex: layer === "front" ? 100 : 0,
+        zIndex: layer === "front" ? zIndex : 0,
       }}
       drag
       dragListener={false}

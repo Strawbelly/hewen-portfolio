@@ -3,13 +3,16 @@
 import { motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { CollageItem, type CollageHover } from "@/features/landing/components/CollageItem";
+import {
+  CollageItem,
+  type CollageHover,
+} from "@/features/landing/components/CollageItem";
 import { HelloWorldReveal } from "@/features/landing/components/HelloWorldReveal";
 import {
   DESIGN_HEIGHT,
   DESIGN_WIDTH,
   desktopLayout,
-  desktopMotion
+  desktopMotion,
 } from "@/features/landing/desktopLayout";
 import {
   backspace,
@@ -19,10 +22,11 @@ import {
   KeypadDigit,
   MultiTapState,
   pressDigit,
-  previewText
+  previewText,
 } from "@/lib/phone/multitap";
 import { PhoneKeypad } from "@/features/landing/phone/PhoneKeypad";
 import { PhoneScreen } from "@/features/landing/phone/PhoneScreen";
+import { usePhoneSounds } from "@/features/landing/phone/usePhoneSounds";
 
 type FlipPhoneProps = {
   onConnected: () => void;
@@ -32,7 +36,7 @@ type FlipPhoneProps = {
 const initialState: MultiTapState = {
   committed: "",
   pendingKey: null,
-  pendingIndex: 0
+  pendingIndex: 0,
 };
 
 const DESKTOP_BREAKPOINT = 768;
@@ -45,8 +49,12 @@ const getViewportLayout = () => {
   const isDesktop = window.innerWidth >= DESKTOP_BREAKPOINT;
   return {
     isDesktop,
-    supportsHover: window.matchMedia("(hover: hover) and (pointer: fine)").matches,
-    scale: Math.min(window.innerWidth / DESIGN_WIDTH, window.innerHeight / DESIGN_HEIGHT)
+    supportsHover: window.matchMedia("(hover: hover) and (pointer: fine)")
+      .matches,
+    scale: Math.min(
+      window.innerWidth / DESIGN_WIDTH,
+      window.innerHeight / DESIGN_HEIGHT,
+    ),
   };
 };
 
@@ -56,7 +64,7 @@ const landingStickers = [
     src: "/assets/landing/error-stack.png",
     className: "landing-error-stack",
     width: 1536,
-    height: 1024
+    height: 1024,
   },
   {
     layoutKey: "calendar",
@@ -64,36 +72,36 @@ const landingStickers = [
     className: "landing-calendar",
     width: 124,
     height: 102,
-    hover: { scale: 1.06, y: -5, rotate: 3, duration: 0.25 }
+    hover: { scale: 1.06, y: -5, rotate: 3, duration: 0.25 },
   },
   {
     layoutKey: "newJess",
-    src: "/assets/landing/new-jess.png",
+    src: "/assets/landing/new-hewen.png",
     className: "landing-new-jess",
     width: 1679,
     height: 937,
-    hover: { scale: 1.03, y: -3, rotate: 0.75, duration: 0.3 }
+    hover: { scale: 1.03, y: -3, rotate: 0.75, duration: 0.3 },
   },
   {
     layoutKey: "cursor",
     src: "/assets/landing/cursor.png",
     className: "landing-cursor",
     width: 185,
-    height: 109
+    height: 109,
   },
   {
     layoutKey: "loading",
     src: "/assets/landing/loading-window.jpg",
     className: "landing-loading",
     width: 590,
-    height: 370
+    height: 370,
   },
   {
     layoutKey: "helloWorld",
     src: "/assets/landing/hello-world.png",
     className: "landing-hello-world",
     width: 1214,
-    height: 1295
+    height: 1295,
   },
   {
     layoutKey: "cd",
@@ -101,7 +109,7 @@ const landingStickers = [
     className: "landing-cd",
     width: 1536,
     height: 1024,
-    hover: { scale: 1.025, rotate: 4, duration: 0.35 }
+    hover: { scale: 1.025, rotate: 4, duration: 0.35 },
   },
   {
     layoutKey: "music",
@@ -109,7 +117,7 @@ const landingStickers = [
     className: "landing-music",
     width: 205,
     height: 257,
-    hover: { scale: 1.08, y: -4, rotate: -3, duration: 0.22 }
+    hover: { scale: 1.08, y: -4, rotate: -3, duration: 0.22 },
   },
   {
     layoutKey: "camera",
@@ -117,7 +125,7 @@ const landingStickers = [
     className: "landing-camera",
     width: 1536,
     height: 1024,
-    hover: { scale: 1.025, y: -4, rotate: 1, duration: 0.3 }
+    hover: { scale: 1.025, y: -4, rotate: 1, duration: 0.3 },
   },
   {
     layoutKey: "folder",
@@ -125,16 +133,19 @@ const landingStickers = [
     className: "landing-folder",
     width: 209,
     height: 182,
-    hover: { scale: 1.06, y: -8, rotate: 2, duration: 0.25 }
-  }
+    hover: { scale: 1.06, y: -8, rotate: 2, duration: 0.25 },
+  },
 ] as const;
 
 export function FlipPhone({ onConnected, onSkip }: FlipPhoneProps) {
   const [tapState, setTapState] = useState<MultiTapState>(initialState);
-  const [status, setStatus] = useState<"typing" | "connecting" | "connected">("typing");
+  const [status, setStatus] = useState<"typing" | "connecting" | "connected">(
+    "typing",
+  );
   const [viewportLayout, setViewportLayout] = useState(getViewportLayout);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const reduceMotion = useReducedMotion();
+  const { playDtmf, playUiClick } = usePhoneSounds();
   const text = previewText(tapState).slice(0, 12);
   const canConnect = text === "HEWEN";
 
@@ -157,16 +168,19 @@ export function FlipPhone({ onConnected, onSkip }: FlipPhoneProps) {
       return;
     }
 
+    playDtmf(digit);
     setTapState((current) => pressDigit(current, digit));
     scheduleCommit();
   };
 
   const handleBack = () => {
+    playUiClick();
     clearCommitTimer();
     setTapState((current) => backspace(current));
   };
 
   const handleOk = () => {
+    playUiClick();
     clearCommitTimer();
     const committed = commitPending(tapState);
     const nextText = previewText(committed);
@@ -217,7 +231,7 @@ export function FlipPhone({ onConnected, onSkip }: FlipPhoneProps) {
   const frameStyle = viewportLayout.isDesktop
     ? {
         width: DESIGN_WIDTH * viewportLayout.scale,
-        height: DESIGN_HEIGHT * viewportLayout.scale
+        height: DESIGN_HEIGHT * viewportLayout.scale,
       }
     : undefined;
 
@@ -225,15 +239,19 @@ export function FlipPhone({ onConnected, onSkip }: FlipPhoneProps) {
     ? {
         width: DESIGN_WIDTH,
         height: DESIGN_HEIGHT,
-        transform: `scale(${viewportLayout.scale})`
+        transform: `scale(${viewportLayout.scale})`,
       }
     : undefined;
 
   const getAmbientMotion = (layoutKey: keyof typeof desktopLayout) =>
-    viewportLayout.isDesktop && !reduceMotion ? desktopMotion[layoutKey] : undefined;
+    viewportLayout.isDesktop && !reduceMotion
+      ? desktopMotion[layoutKey]
+      : undefined;
 
   const getHoverMotion = (hover?: CollageHover) =>
-    viewportLayout.isDesktop && viewportLayout.supportsHover && !reduceMotion ? hover : undefined;
+    viewportLayout.isDesktop && viewportLayout.supportsHover && !reduceMotion
+      ? hover
+      : undefined;
 
   return (
     <section className="landing-collage-stage">
@@ -260,7 +278,9 @@ export function FlipPhone({ onConnected, onSkip }: FlipPhoneProps) {
               key={sticker.src}
               item={desktopLayout[sticker.layoutKey]}
               motionConfig={getAmbientMotion(sticker.layoutKey)}
-              hoverConfig={getHoverMotion("hover" in sticker ? sticker.hover : undefined)}
+              hoverConfig={getHoverMotion(
+                "hover" in sticker ? sticker.hover : undefined,
+              )}
               className={sticker.className}
             >
               {sticker.layoutKey === "helloWorld" ? (
@@ -302,6 +322,7 @@ export function FlipPhone({ onConnected, onSkip }: FlipPhoneProps) {
                   onDigit={handleDigit}
                   onBack={handleBack}
                   onOk={handleOk}
+                  onSend={playUiClick}
                   canConnect={canConnect}
                   disabled={status !== "typing"}
                 />
