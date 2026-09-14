@@ -21,5 +21,5 @@ export const mainWorldDecorationConfig: MainWorldDecorationLayout[] = [
   { filename: "decoration_02.png", aspectRatio: "2532 / 2031", x: 68, y: 66, width: 120, rotation: 0, zIndex: 100 },
   { filename: "decoration_03.png", aspectRatio: "447 / 465", x: 28, y: 53, width: 120, rotation: 0, zIndex: 100 },
   { filename: "decoration_04.png", aspectRatio: "371 / 475", x: 7.5, y: 40, width: 66, rotation: 0, zIndex: 100 },
-  { filename: "decoration_05.png", aspectRatio: "350 / 1365", x: 12, y: 64, width: 60, rotation: 0, zIndex: 100 },
+  { filename: "decoration_05.png", aspectRatio: "350 / 1365", x: 12, y: 60, width: 68, rotation: 0, zIndex: 100 },
 ];
