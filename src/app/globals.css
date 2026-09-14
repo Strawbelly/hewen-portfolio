@@ -695,6 +695,26 @@ button:disabled {
   overflow: visible;
 }
 
+@media (min-width: 769px) {
+  .main-world-viewport {
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .main-world-viewport .main-world-desktop {
+    width: calc(100vw / 0.9);
+    height: calc(100vh / 0.9);
+    min-height: 0;
+    transform: scale(0.9);
+    transform-origin: top left;
+  }
+
+  .main-world-viewport .main-world-pile {
+    width: 100%;
+    height: calc(100vh / 0.9 - var(--main-world-taskbar-height));
+  }
+}
+
 .main-world-desktop-icon {
   position: absolute;
   z-index: 2;

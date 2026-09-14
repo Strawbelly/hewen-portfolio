@@ -211,6 +211,7 @@ export function MainWorld({ collageImages }: { collageImages: CollageImage[] }) 
   };
 
   return (
+    <div className="main-world-viewport">
     <div
       id="top"
       className="world-canvas main-world-desktop"
@@ -335,6 +336,7 @@ export function MainWorld({ collageImages }: { collageImages: CollageImage[] }) 
         onWindowActivate={handleTaskbarWindow}
         collagesVisible={visibleWindowStates.collages.status !== "closed"}
       />
+    </div>
     </div>
   );
 }
