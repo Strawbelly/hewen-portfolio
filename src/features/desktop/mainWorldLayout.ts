@@ -12,40 +12,40 @@ export type MainWorldWindowLayout = {
 };
 
 export const mainWorldLayout = {
-  // BACK — journey peeking from upper-right
+  // BACK — journey peeking at the right, tucked beneath the editor
   journey: {
-    x: 64,
-    y: 18,
+    x: 78,
+    y: 30,
     width: 34,
     height: 420,
     rotation: 0,
-    zIndex: 9,
+    zIndex: 42,
   },
 
   // BACK / MID — editor extending through lower-right
   experience: {
-    x: 50,
-    y: 50,
+    x: 46,
+    y: 70,
     width: 36,
     height: 420,
     rotation: 0,
-    zIndex: 35,
+    zIndex: 41,
   },
 
-  // MIDDLE — primary Open dialog
+  // FRONT — primary Open dialog remains the desktop focal point
   projects: {
     x: 33,
-    y: 6,
+    y: 4,
     width: 50,
     height: 600,
     rotation: 0,
-    zIndex: 25,
+    zIndex: 40,
   },
 
-  // FRONT — small but still substantial
+  // BACK / MID — notepad peeking from the left
   about: {
-    x: 11,
-    y: 10,
+    x: 10,
+    y: 12,
     width: 20,
     height: 248,
     rotation: 0,
@@ -54,8 +54,8 @@ export const mainWorldLayout = {
 
   // FRONT — system dialog
   contact: {
-    x: 10,
-    y: 72,
+    x: 17,
+    y: 74,
     width: 23,
     height: 280,
     rotation: 0,

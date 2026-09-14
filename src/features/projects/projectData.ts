@@ -13,18 +13,39 @@ export type ProjectOption = {
 
 export const projectOptions: ProjectOption[] = [
   {
-    id: "online-learning-platform",
-    title: "Online Learning Platform",
+    id: "distributed-online-learning-platform",
+    title: "Distributed Online Learning Platform",
     type: "Distributed Systems",
-    description: "Learning workflow, progress, and leaderboard services",
-    technologies: ["React", "Java", "Spring Boot", "PostgreSQL"],
-    previewTitle: "Education Platform",
-    previewHighlights: [
-      { title: "Progress Aggregation", description: "Combine lesson, quiz, and assignment activity into one stable learner progress model." },
-      { title: "Role Boundaries", description: "Keep learner, instructor, and administrator operations explicit across service boundaries." },
-      { title: "Leaderboard Consistency", description: "Update rankings efficiently without coupling score writes to every leaderboard query." },
+    description: "High-concurrency learning workflows, distributed locking, and real-time leaderboard services",
+    technologies: [
+      "Java",
+      "Spring Boot",
+      "Spring Cloud",
+      "MySQL",
+      "Redis",
+      "RabbitMQ",
+      "Redisson",
+      "XXL-JOB"
     ],
-    github: "https://github.com/Strawbelly/online-learning-platform",
+    previewTitle: "Distributed Learning Platform",
+    previewHighlights: [
+  {
+    title: "Learning Progress Optimization",
+    description:
+      "Coalesced high-frequency video progress updates with Redis and a Redisson delayed queue, reducing MySQL writes by ~95%."
+  },
+  {
+    title: "High-Concurrency Coupon Claiming",
+    description:
+      "Built a reusable distributed locking framework with Spring AOP and Factory/Strategy patterns, then redesigned coupon claiming with Redis Lua scripts and RabbitMQ for atomic validation and asynchronous persistence under high concurrency."
+  },
+  {
+    title: "Seasonal Learning-Points System",
+    description:
+      "Processed point-earning events asynchronously with RabbitMQ, maintained real-time rankings with Redis Sorted Sets, and used season-based MySQL table sharding with distributed job and task sharding for parallel historical persistence."
+  }
+],
+    github: "https://github.com/Strawbelly/distributed-online-learning-platform",
     icon: "/assets/icons/projects/project-education.png",
     iconScale: 1,
   },
@@ -126,9 +147,9 @@ export const projectOptions: ProjectOption[] = [
     description:
       "Built an animation system for six characters with idle, attack, special attack, hurt, and death states, integrated it into the main game logic, and added sound effects.",
   },
-],
-  github: "https://github.com/Strawbelly/pygame-Temple-Fantasy",
-  icon: "/assets/icons/projects/project-game.png",
-  iconScale: 1.55,
-},
+  ],
+    github: "https://github.com/Strawbelly/pygame-Temple-Fantasy",
+    icon: "/assets/icons/projects/project-game.png",
+    iconScale: 1.55,
+  },
 ];

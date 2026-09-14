@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
+import type { MutableRefObject } from "react";
 import { useEffect, useRef, useState } from "react";
 import {
   CollageItem,
@@ -144,6 +145,12 @@ export function FlipPhone({ onConnected, onSkip }: FlipPhoneProps) {
   );
   const [viewportLayout, setViewportLayout] = useState(getViewportLayout);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hasUserInteracted = useRef(false);
+  const connectedSoundPlayed = useRef(false);
+  const enterClickDownSound = useRef<HTMLAudioElement | null>(null);
+  const enterClickUpSound = useRef<HTMLAudioElement | null>(null);
+  const enterClickPointerPressed = useRef(false);
+  const enterClickReleasedForClick = useRef(false);
   const reduceMotion = useReducedMotion();
   const { playDtmf, playUiClick } = usePhoneSounds();
   const text = previewText(tapState).slice(0, 12);
@@ -168,18 +175,21 @@ export function FlipPhone({ onConnected, onSkip }: FlipPhoneProps) {
       return;
     }
 
+    hasUserInteracted.current = true;
     playDtmf(digit);
     setTapState((current) => pressDigit(current, digit));
     scheduleCommit();
   };
 
   const handleBack = () => {
+    hasUserInteracted.current = true;
     playUiClick();
     clearCommitTimer();
     setTapState((current) => backspace(current));
   };
 
   const handleOk = () => {
+    hasUserInteracted.current = true;
     playUiClick();
     clearCommitTimer();
     const committed = commitPending(tapState);
@@ -194,6 +204,96 @@ export function FlipPhone({ onConnected, onSkip }: FlipPhoneProps) {
     window.setTimeout(() => setStatus("connected"), reduceMotion ? 150 : 900);
     window.setTimeout(onConnected, reduceMotion ? 350 : 1450);
   };
+
+  const playEnterClickPart = (
+    soundRef: MutableRefObject<HTMLAudioElement | null>,
+    src: string,
+  ) => {
+    try {
+      const clickSound = soundRef.current ?? new Audio(src);
+      soundRef.current = clickSound;
+      clickSound.volume = 0.9;
+      clickSound.currentTime = 0;
+      void clickSound.play().catch(() => undefined);
+    } catch {
+      // Audio feedback should never block entering the portfolio.
+    }
+  };
+
+  const playEnterClickDown = () => {
+    playEnterClickPart(
+      enterClickDownSound,
+      "/assets/audio/enter-click-down.wav",
+    );
+  };
+
+  const playEnterClickUp = () => {
+    playEnterClickPart(enterClickUpSound, "/assets/audio/enter-click-up.wav");
+  };
+
+  const playEnterClickSequence = () => {
+    playEnterClickDown();
+    window.setTimeout(playEnterClickUp, 75);
+  };
+
+  const handleEnterPointerDown = () => {
+    enterClickPointerPressed.current = true;
+    enterClickReleasedForClick.current = false;
+    playEnterClickDown();
+  };
+
+  const handleEnterPointerUp = () => {
+    if (!enterClickPointerPressed.current) {
+      return;
+    }
+
+    enterClickPointerPressed.current = false;
+    enterClickReleasedForClick.current = true;
+    playEnterClickUp();
+  };
+
+  const handleEnterPointerCancel = () => {
+    enterClickPointerPressed.current = false;
+  };
+
+  const handleSkip = () => {
+    if (enterClickReleasedForClick.current) {
+      enterClickReleasedForClick.current = false;
+    } else {
+      playEnterClickSequence();
+    }
+
+    onSkip();
+  };
+
+  useEffect(() => {
+    if (
+      status !== "connected" ||
+      connectedSoundPlayed.current ||
+      !hasUserInteracted.current
+    ) {
+      return;
+    }
+
+    connectedSoundPlayed.current = true;
+    const connectedSound = new Audio("/assets/audio/connected.mp3");
+    connectedSound.volume = 0.2;
+    void connectedSound.play().catch(() => {
+      // Some browsers can still decline delayed playback; the transition should continue silently.
+    });
+  }, [status]);
+
+  useEffect(() => {
+    const clickDownSound = new Audio("/assets/audio/enter-click-down.wav");
+    clickDownSound.preload = "auto";
+    clickDownSound.volume = 0.9;
+    enterClickDownSound.current = clickDownSound;
+
+    const clickUpSound = new Audio("/assets/audio/enter-click-up.wav");
+    clickUpSound.preload = "auto";
+    clickUpSound.volume = 0.9;
+    enterClickUpSound.current = clickUpSound;
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -257,7 +357,10 @@ export function FlipPhone({ onConnected, onSkip }: FlipPhoneProps) {
     <section className="landing-collage-stage">
       <button
         type="button"
-        onClick={onSkip}
+        onPointerDown={handleEnterPointerDown}
+        onPointerUp={handleEnterPointerUp}
+        onPointerCancel={handleEnterPointerCancel}
+        onClick={handleSkip}
         className="focus-ring landing-skip-link"
       >
         <span>ENTER MY WORLD</span>
